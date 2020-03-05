@@ -1,6 +1,10 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct{
     } GPIOStruct;
 
@@ -48,4 +52,8 @@ extern ControllerStruct controller;
 extern ObserverStruct observer;
 extern COMStruct com;
 
+
+#ifdef __cplusplus
+}
+#endif
 #endif

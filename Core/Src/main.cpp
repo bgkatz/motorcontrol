@@ -29,11 +29,15 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "structs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "structs.h"
+#include <stdio.h>
+#include "stm32f4xx_flash.h"
+#include "FlashWriter.h"
+#include "PreferenceWriter.h"
+#include "user_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,14 +72,20 @@
 /* Flash Registers */
 float __float_reg[64];
 int __int_reg[256];
+PreferenceWriter prefs(6);
+
+int count = 0;
+int state = REST_MODE;
+int state_change;
 
 /* Structs for control, etc */
 ControllerStruct controller;
 ObserverStruct observer;
 COMStruct com;
 
-/* USER CODE END PV */
+uint8_t aRxBuffer[20];
 
+/* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -121,12 +131,25 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_TIM1_Init();
-
   /* USER CODE BEGIN 2 */
-  printf("hello\r\n");
-  HAL_TIM_Base_Start_IT(&htim1);
 
 
+  prefs.load();
+  printf("Hello\r\n");
+  //printf("E_OFFSET: %f\r\n", E_OFFSET);
+  //HAL_TIM_Base_Start_IT(&htim1);
+
+  if(E_OFFSET!=5.12f){
+	  E_OFFSET = 5.12f;
+  	  if (!prefs.ready()) prefs.open();
+  	  prefs.flush();                                                         // write offset and lookup table to flash
+  	  prefs.close();
+  	  printf("Wrote Preferences to flash\r\r");
+  }
+
+  HAL_UART_Receive_IT(&huart2, (uint8_t *)aRxBuffer, 1);
+
+  //HAL_UART_MspInit(&huart2);
   /* USER CODE END 2 */
  
  
@@ -135,8 +158,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  HAL_UART_Receive_IT(&huart2, (uint8_t *)aRxBuffer, 1);
+	  HAL_Delay(10);
     /* USER CODE END WHILE */
-	  printf("Loop Count: %d\r\n", controller.loop_count);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
