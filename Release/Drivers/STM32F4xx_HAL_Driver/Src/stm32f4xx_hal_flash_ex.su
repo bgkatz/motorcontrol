@@ -1,0 +1,11 @@
+stm32f4xx_hal_flash_ex.c:953:13:FLASH_MassErase.isra.0	0	static
+stm32f4xx_hal_flash_ex.c:286:19:HAL_FLASHEx_OBProgram	16	static
+stm32f4xx_hal_flash_ex.c:345:6:HAL_FLASHEx_OBGetConfig	0	static
+stm32f4xx_hal_flash_ex.c:374:19:HAL_FLASHEx_AdvOBProgram	8	static
+stm32f4xx_hal_flash_ex.c:430:6:HAL_FLASHEx_AdvOBGetConfig	0	static
+stm32f4xx_hal_flash_ex.c:462:19:HAL_FLASHEx_OB_SelectPCROP	0	static
+stm32f4xx_hal_flash_ex.c:487:19:HAL_FLASHEx_OB_DeSelectPCROP	0	static
+stm32f4xx_hal_flash_ex.c:982:6:FLASH_Erase_Sector	0	static
+stm32f4xx_hal_flash_ex.c:233:19:HAL_FLASHEx_Erase_IT	8	static
+stm32f4xx_hal_flash_ex.c:1311:6:FLASH_FlushCaches	0	static
+stm32f4xx_hal_flash_ex.c:162:19:HAL_FLASHEx_Erase	32	static
