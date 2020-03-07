@@ -1,3 +1,10 @@
+/*
+ * structs.h
+ *
+ *  Created on: Mar 5, 2020
+ *      Author: Ben
+ */
+
 #ifndef STRUCTS_H
 #define STRUCTS_H
 

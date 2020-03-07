@@ -110,6 +110,15 @@ HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, 0xffff);
 return 0;
 }
 
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  /* Prevent unused argument(s) compilation warning */
+	HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
+  /* NOTE: This function should not be modified, when the callback is needed,
+           the HAL_UART_RxCpltCallback could be implemented in the user file
+   */
+}
 /* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

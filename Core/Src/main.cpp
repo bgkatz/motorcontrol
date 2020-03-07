@@ -52,14 +52,6 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-
-#define REST_MODE           0
-#define CALIBRATION_MODE    1
-#define MOTOR_MODE          2
-#define SETUP_MODE          4
-#define ENCODER_MODE        5
-#define INIT_TEMP_MODE      6
-
 #define VERSION_NUM "2.0"
 
 
@@ -83,7 +75,7 @@ ControllerStruct controller;
 ObserverStruct observer;
 COMStruct com;
 
-uint8_t aRxBuffer[20];
+uint8_t Serial2RxBuffer[1];
 
 /* USER CODE END PV */
 
@@ -147,7 +139,7 @@ int main(void)
   	  printf("Wrote Preferences to flash\r\r");
   }
 
-  HAL_UART_Receive_IT(&huart2, (uint8_t *)aRxBuffer, 1);
+  HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
 
   //HAL_UART_MspInit(&huart2);
   /* USER CODE END 2 */
@@ -158,8 +150,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_UART_Receive_IT(&huart2, (uint8_t *)aRxBuffer, 1);
-	  HAL_Delay(10);
+	  //HAL_Delay(100);
+	  //printf("Got some serial:  %d\r\n", Serial2RxBuffer[0]);
+
+	  //printf("Main Loop Serial: %d", Serial2RxBuffer[1]);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include "structs.h"
+#include "usart.h"
 
 /* USER CODE END Includes */
 
@@ -220,7 +221,8 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
-	printf("Got some serial\r\n");
+	//printf("Got some serial:  %d\r\n", Serial2RxBuffer[0]);
+
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
