@@ -1,5 +1,6 @@
 "Core/Src/FlashWriter.o"
 "Core/Src/PrefrenceWriter.o"
+"Core/Src/fsm.o"
 "Core/Src/gpio.o"
 "Core/Src/main.o"
 "Core/Src/stm32f4xx_flash.o"

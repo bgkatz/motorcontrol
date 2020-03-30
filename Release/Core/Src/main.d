@@ -31,7 +31,7 @@ Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
  ../Core/Inc/gpio.h ../Core/Inc/structs.h ../Core/Inc/stm32f4xx_flash.h \
  ../Core/Inc/FlashWriter.h ../Core/Inc/stm32f4xx_flash.h \
  ../Core/Inc/PreferenceWriter.h ../Core/Inc/FlashWriter.h \
- ../Core/Inc/user_config.h
+ ../Core/Inc/user_config.h ../Core/Inc/fsm.h ../Core/Inc/structs.h
 
 ../Core/Inc/main.h:
 
@@ -112,3 +112,7 @@ Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
 ../Core/Inc/FlashWriter.h:
 
 ../Core/Inc/user_config.h:
+
+../Core/Inc/fsm.h:
+
+../Core/Inc/structs.h:

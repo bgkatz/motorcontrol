@@ -12,11 +12,18 @@
  extern "C" {
 #endif
 
+#include <stdint.h>
+
 typedef struct{
     } GPIOStruct;
 
 typedef struct{
     }COMStruct;
+
+typedef struct{
+	uint8_t state;
+	uint8_t state_change;
+}FSMStruct;
 
 typedef struct{
     int adc1_raw, adc2_raw, adc3_raw;                       // Raw ADC Values
@@ -58,6 +65,7 @@ typedef struct{
 extern ControllerStruct controller;
 extern ObserverStruct observer;
 extern COMStruct com;
+extern FSMStruct state;
 
 
 #ifdef __cplusplus

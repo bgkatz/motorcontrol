@@ -38,6 +38,7 @@
 #include "FlashWriter.h"
 #include "PreferenceWriter.h"
 #include "user_config.h"
+#include "fsm.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,13 +68,12 @@ int __int_reg[256];
 PreferenceWriter prefs(6);
 
 int count = 0;
-int state = REST_MODE;
-int state_change;
 
 /* Structs for control, etc */
 ControllerStruct controller;
 ObserverStruct observer;
 COMStruct com;
+FSMStruct state;
 
 uint8_t Serial2RxBuffer[1];
 
@@ -128,19 +128,10 @@ int main(void)
 
   prefs.load();
   printf("Hello\r\n");
-  //printf("E_OFFSET: %f\r\n", E_OFFSET);
-  //HAL_TIM_Base_Start_IT(&htim1);
 
-  if(E_OFFSET!=5.12f){
-	  E_OFFSET = 5.12f;
-  	  if (!prefs.ready()) prefs.open();
-  	  prefs.flush();                                                         // write offset and lookup table to flash
-  	  prefs.close();
-  	  printf("Wrote Preferences to flash\r\r");
-  }
 
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
-
+  HAL_TIM_Base_Start_IT(&htim1);
   //HAL_UART_MspInit(&huart2);
   /* USER CODE END 2 */
  
@@ -150,8 +141,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //HAL_Delay(100);
-	  //printf("Got some serial:  %d\r\n", Serial2RxBuffer[0]);
+	  //HAL_Delay(200);
+	  //printf("Main Loop Count:  %d\r\n", state.state_change);
 
 	  //printf("Main Loop Serial: %d", Serial2RxBuffer[1]);
     /* USER CODE END WHILE */
