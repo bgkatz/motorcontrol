@@ -40,6 +40,7 @@ int flashReadInt(uint32_t sector, uint32_t index);
 uint32_t flashReadUint(uint32_t sector, uint32_t index);
 float flashReadFloat(uint32_t sector, uint32_t index);
     
+
 #ifdef __cplusplus
 }
 #endif

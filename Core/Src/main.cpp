@@ -70,6 +70,7 @@ PreferenceWriter prefs(6);
 int count = 0;
 
 /* Structs for control, etc */
+
 ControllerStruct controller;
 ObserverStruct observer;
 COMStruct com;

@@ -19,4 +19,6 @@ private:
     bool __ready;
 };
 
+extern PreferenceWriter prefs;
+
 #endif
