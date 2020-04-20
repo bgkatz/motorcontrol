@@ -3,6 +3,11 @@
 #ifndef USER_CONFIG_H
 #define USER_CONFIG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #define E_OFFSET                __float_reg[0]                                  // Encoder electrical offset
 #define M_OFFSET                __float_reg[1]                                  // Encoder mechanical offset
@@ -26,5 +31,9 @@
 
 extern float __float_reg[];
 extern int __int_reg[];
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

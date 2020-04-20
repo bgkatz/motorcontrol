@@ -7,6 +7,10 @@
 
 #ifndef INC_FLASH_WRITER_H_
 #define INC_FLASH_WRITER_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "stm32f4xx_flash.h"
 #include "stdbool.h"
@@ -39,17 +43,12 @@ void flash_writer_write_int(FlashWriter fw, uint32_t index, int x);
 void flash_writer_write_uint(FlashWriter fw, uint32_t index, unsigned int x);
 void flash_writer_write_float(FlashWriter fw, uint32_t index, float x);
 void flash_writer_close(FlashWriter *fw);
-int flash_read_int(uint32_t sector, uint32_t index);
-uint32_t flash_read_uint(uint32_t sector, uint32_t index);
-float flash_read_float(uint32_t sector, uint32_t index);
+int flash_read_int(FlashWriter fw, uint32_t index);
+uint32_t flash_read_uint(FlashWriter fw, uint32_t index);
+float flash_read_float(FlashWriter fw, uint32_t index);
 
-int flashReadInt(uint32_t sector, uint32_t index);
-uint32_t flashReadUint(uint32_t sector, uint32_t index);
-float flashReadFloat(uint32_t sector, uint32_t index);
-
-
-
-
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INC_FLASH_WRITER_H_ */

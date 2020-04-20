@@ -137,8 +137,23 @@ int main(void)
   MX_ADC2_Init();
   MX_ADC3_Init();
   /* USER CODE BEGIN 2 */
+
   printf("Hello\r\n");
+
   flash_writer_init(&flash, 6);
+
+  flash_writer_open(&flash);
+  //flash_writer_write_uint(flash, 14, 1234567);
+  flash_writer_write_float(flash, 14, 12.34567);
+
+  flash_writer_close(&flash);
+
+  //uint32_t flash_data = flash_read_uint(flash, 14);
+  float flash_data = flash_read_float(flash, 14);
+
+  //printf("Flash value: %u\r\n", flash_data);
+  printf("Flash value: %f\r\n", flash_data);
+
   /* USER CODE END 2 */
  
  

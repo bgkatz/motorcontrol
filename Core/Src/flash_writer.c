@@ -1,5 +1,6 @@
 #include "stm32f4xx_flash.h"
 #include "flash_writer.h"
+#include <stdio.h>
 
 
 
@@ -33,7 +34,7 @@ void flash_writer_write_uint(FlashWriter fw, uint32_t index, unsigned int x) {
 }
 
 void flash_writer_write_float(FlashWriter fw, uint32_t index, float x) {
-    union UN {int a; uint32_t b;};
+    union UN {float a; uint32_t b;};
     union UN un;
     un.a = x;
     FLASH_ProgramWord(fw.base + 4 * index, un.b);
@@ -44,16 +45,16 @@ void flash_writer_close(FlashWriter * fw) {
     fw->ready = false;
 }
 
-int flash_read_int(uint32_t sector, uint32_t index) {
-    return *(int*) (__SECTOR_ADDRS[sector] + 4 * index);
+int flash_read_int(FlashWriter fw, uint32_t index) {
+    return *(int*) (__SECTOR_ADDRS[fw.sector] + 4 * index);
 }
 
-uint32_t flash_read_uint(uint32_t sector, uint32_t index) {
-    return *(uint32_t*) (__SECTOR_ADDRS[sector] + 4 * index);
+uint32_t flash_read_uint(FlashWriter fw, uint32_t index) {
+    return *(uint32_t*) (__SECTOR_ADDRS[fw.sector] + 4 * index);
 }
 
-float flash_read_float(uint32_t sector, uint32_t index) {
-    return *(float*) (__SECTOR_ADDRS[sector] + 4 * index);
+float flash_read_float(FlashWriter fw, uint32_t index) {
+    return *(float*) (__SECTOR_ADDRS[fw.sector] + 4 * index);
 }
 
 

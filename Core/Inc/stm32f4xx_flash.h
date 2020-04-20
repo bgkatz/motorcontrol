@@ -31,9 +31,10 @@
 #define __STM32F4xx_FLASH_H
  
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
- 
+
+
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
  
@@ -411,7 +412,6 @@ FLASH_Status FLASH_WaitForLastOperation2(void);
 #ifdef __cplusplus
 }
 #endif
- 
 #endif /* __STM32F4xx_FLASH_H */
  
 /**

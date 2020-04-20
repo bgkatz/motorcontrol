@@ -8,6 +8,10 @@
 
 #ifndef INC_FSM_H_
 #define INC_FSM_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 
 
@@ -22,6 +26,8 @@
 
  void run_fsm(FSMStruct fsmstate);
  void update_fsm(FSMStruct fsmstate, char fsm_input);
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* INC_FSM_H_ */
