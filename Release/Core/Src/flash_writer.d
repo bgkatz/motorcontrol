@@ -1,5 +1,4 @@
-Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp \
- ../Core/Inc/PreferenceWriter.h ../Core/Inc/FlashWriter.h \
+Core/Src/flash_writer.o: ../Core/Src/flash_writer.c \
  ../Core/Inc/stm32f4xx_flash.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h \
@@ -33,11 +32,7 @@ Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/FlashWriter.h ../Core/Inc/user_config.h
-
-../Core/Inc/PreferenceWriter.h:
-
-../Core/Inc/FlashWriter.h:
+ ../Core/Inc/flash_writer.h ../Core/Inc/stm32f4xx_flash.h
 
 ../Core/Inc/stm32f4xx_flash.h:
 
@@ -105,6 +100,6 @@ Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp \
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-../Core/Inc/FlashWriter.h:
+../Core/Inc/flash_writer.h:
 
-../Core/Inc/user_config.h:
+../Core/Inc/stm32f4xx_flash.h:

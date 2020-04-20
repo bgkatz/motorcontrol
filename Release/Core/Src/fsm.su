@@ -1,2 +1,2 @@
-fsm.cpp:14:7:void run_fsm(FSMStruct)	8	static
-fsm.cpp:38:7:void update_fsm(FSMStruct, char)	16	static
+fsm.c:14:7:run_fsm	8	static
+fsm.c:38:7:update_fsm	16	static

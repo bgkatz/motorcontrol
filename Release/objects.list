@@ -1,7 +1,6 @@
-"Core/Src/FlashWriter.o"
-"Core/Src/PrefrenceWriter.o"
 "Core/Src/adc.o"
 "Core/Src/can.o"
+"Core/Src/flash_writer.o"
 "Core/Src/fsm.o"
 "Core/Src/gpio.o"
 "Core/Src/main.o"

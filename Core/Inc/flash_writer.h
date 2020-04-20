@@ -9,6 +9,7 @@
 #define INC_FLASH_WRITER_H_
 
 #include "stm32f4xx_flash.h"
+#include "stdbool.h"
 
 /* Base address of the Flash sectors */
 #define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbytes */
@@ -25,28 +26,28 @@ static uint32_t __SECTOR_ADDRS[] = {ADDR_FLASH_SECTOR_0, ADDR_FLASH_SECTOR_1, AD
 static uint32_t __SECTORS[] = {FLASH_Sector_0, FLASH_Sector_1, FLASH_Sector_2, FLASH_Sector_3,
                              FLASH_Sector_4, FLASH_Sector_6, FLASH_Sector_6, FLASH_Sector_7};
 
-struct {
+typedef struct {
 	bool ready;
 	uint32_t base;
 	uint32_t sector;
 }FlashWriter;
 
+void flash_writer_init(FlashWriter *fw, uint32_t sector);
 bool flash_writer_ready(FlashWriter fw);
-void flash_writer_open(FlashWriter fw);
-void flash_writer_write(FlashWriter fw, uint32_t index, int x);
-void flash_writer_write(FlashWriter fwuint32_t index, unsigned int x);
-void flash_writer_write(FlashWriter fw, uint32_t index, float x);
-void flash_writer_close(FlashWriter fw);
-int flash_read_int(FlashWriter fw, uint32_t sector, uint32_t index);
-uint32_t flash_read_uint(FlashWriter fw, uint32_t sector, uint32_t index);
-float flash_read_float(FlashWriter fw, uint32_t sector, uint32_t index);
+void flash_writer_open(FlashWriter *fw);
+void flash_writer_write_int(FlashWriter fw, uint32_t index, int x);
+void flash_writer_write_uint(FlashWriter fw, uint32_t index, unsigned int x);
+void flash_writer_write_float(FlashWriter fw, uint32_t index, float x);
+void flash_writer_close(FlashWriter *fw);
+int flash_read_int(uint32_t sector, uint32_t index);
+uint32_t flash_read_uint(uint32_t sector, uint32_t index);
+float flash_read_float(uint32_t sector, uint32_t index);
 
 int flashReadInt(uint32_t sector, uint32_t index);
 uint32_t flashReadUint(uint32_t sector, uint32_t index);
 float flashReadFloat(uint32_t sector, uint32_t index);
 
 
-#endif
 
 
 

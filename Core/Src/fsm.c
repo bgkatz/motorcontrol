@@ -8,7 +8,7 @@
 #include "fsm.h"
 #include "usart.h"
 #include <stdio.h>
-#include "PreferenceWriter.h"
+//#include "PreferenceWriter.h"
 #include "user_config.h"
 
  void run_fsm(FSMStruct fsmstate){
@@ -66,10 +66,10 @@
                 //spi.Sample(DT);
                 HAL_Delay(20);
                 //M_OFFSET = spi.GetMechPosition();
-                if (!prefs.ready()) prefs.open();
-                    prefs.flush();                                                  // Write new prefs to flash
-                    prefs.close();
-                    prefs.load();
+                //if (!prefs.ready()) prefs.open();
+                //    prefs.flush();                                                  // Write new prefs to flash
+                //    prefs.close();
+                //    prefs.load();
                 //spi.SetMechOffset(M_OFFSET);
                 printf("\n\r  Saved new zero position:  %.4f\n\r\n\r", M_OFFSET);
                 break;

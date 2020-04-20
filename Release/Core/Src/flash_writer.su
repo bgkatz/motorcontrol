@@ -1,0 +1,10 @@
+flash_writer.c:7:6:flash_writer_init	0	static
+flash_writer.c:13:6:flash_writer_ready	16	static
+flash_writer.c:17:6:flash_writer_open	8	static
+flash_writer.c:24:6:flash_writer_write_int	16	static
+flash_writer.c:31:6:flash_writer_write_uint	16	static
+flash_writer.c:35:6:flash_writer_write_float	16	static
+flash_writer.c:42:6:flash_writer_close	8	static
+flash_writer.c:47:5:flash_read_int	0	static
+flash_writer.c:51:10:flash_read_uint	0	static
+flash_writer.c:55:7:flash_read_float	0	static

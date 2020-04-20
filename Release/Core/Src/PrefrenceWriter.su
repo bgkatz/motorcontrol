@@ -1,8 +1,0 @@
-PrefrenceWriter.cpp:5:1:PreferenceWriter::PreferenceWriter(uint32_t)	16	static
-PrefrenceWriter.cpp:11:6:void PreferenceWriter::open()	8	static
-PrefrenceWriter.cpp:16:7:bool PreferenceWriter::ready()	0	static
-PrefrenceWriter.cpp:20:6:void PreferenceWriter::write(int, int)	0	static
-PrefrenceWriter.cpp:24:6:void PreferenceWriter::write(float, int)	0	static
-PrefrenceWriter.cpp:28:6:void PreferenceWriter::flush()	16	static
-PrefrenceWriter.cpp:39:6:void PreferenceWriter::load()	16	static
-PrefrenceWriter.cpp:49:6:void PreferenceWriter::close()	0	static

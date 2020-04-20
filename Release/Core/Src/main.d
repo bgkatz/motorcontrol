@@ -1,4 +1,4 @@
-Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
+Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -34,8 +34,7 @@ Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
  ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/can.h ../Core/Inc/spi.h \
  ../Core/Inc/tim.h ../Core/Inc/usart.h ../Core/Inc/gpio.h \
  ../Core/Inc/structs.h ../Core/Inc/stm32f4xx_flash.h \
- ../Core/Inc/FlashWriter.h ../Core/Inc/stm32f4xx_flash.h \
- ../Core/Inc/PreferenceWriter.h ../Core/Inc/FlashWriter.h \
+ ../Core/Inc/flash_writer.h ../Core/Inc/stm32f4xx_flash.h \
  ../Core/Inc/user_config.h ../Core/Inc/fsm.h ../Core/Inc/structs.h
 
 ../Core/Inc/main.h:
@@ -122,13 +121,9 @@ Core/Src/main.o: ../Core/Src/main.cpp ../Core/Inc/main.h \
 
 ../Core/Inc/stm32f4xx_flash.h:
 
-../Core/Inc/FlashWriter.h:
+../Core/Inc/flash_writer.h:
 
 ../Core/Inc/stm32f4xx_flash.h:
-
-../Core/Inc/PreferenceWriter.h:
-
-../Core/Inc/FlashWriter.h:
 
 ../Core/Inc/user_config.h:
 
