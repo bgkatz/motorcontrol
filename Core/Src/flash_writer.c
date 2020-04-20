@@ -1,13 +1,6 @@
 #include "stm32f4xx_flash.h"
 #include "flash_writer.h"
-/*
-FlashWriter::FlashWriter(int sector) {
-    if (sector > 7) sector = 7;
-    __sector = sector;
-    __base = __SECTOR_ADDRS[sector];
-    __ready = false;
-}
-*/
+
 
 void flash_writer_init(FlashWriter fw, sector) {
 	if(sector>7) sector = 7;
