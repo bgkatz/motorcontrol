@@ -226,12 +226,12 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
 	// FOC: update sensors //
 
-	run_fsm(state);
-	state.state_change = 0; //delete me later
+	run_fsm(&state);
+	//state.state_change = 0; //delete me later
 
 	controller.loop_count++;
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim1);
+	HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
 }
@@ -246,8 +246,7 @@ void USART2_IRQHandler(void)
 
 	char c = Serial2RxBuffer[0];
 	/* Escape to idle has top priority */
-	update_fsm(state, c);
-
+	update_fsm(&state, c);
 
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);

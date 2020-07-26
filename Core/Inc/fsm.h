@@ -15,7 +15,7 @@ extern "C" {
 
 
 
-#define REST_MODE           0
+#define MENU_MODE           0
 #define CALIBRATION_MODE    1
 #define MOTOR_MODE          2
 #define SETUP_MODE          4
@@ -24,8 +24,13 @@ extern "C" {
 
 #include "structs.h"
 
- void run_fsm(FSMStruct fsmstate);
- void update_fsm(FSMStruct fsmstate, char fsm_input);
+ void run_fsm(FSMStruct* fsmstate);
+ void update_fsm(FSMStruct * fsmstate, char fsm_input);
+ void enter_menu_state(void);
+ void enter_setup_state(void);
+ void calibrate(void);
+ void enter_torque_mode(void);
+
 #ifdef __cplusplus
 }
 #endif

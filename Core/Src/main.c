@@ -56,7 +56,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM "2.0"
+#define VERSION_NUM 2.0f
 
 
 /* USER CODE END PM */
@@ -140,7 +140,20 @@ int main(void)
 
   preference_writer_init(&prefs, 6);
   preference_writer_load(prefs);
+  /* Sanitize configs in case flash is empty*/
+  if(isnan(E_OFFSET)){E_OFFSET = 0.0f;}
+  if(isnan(M_OFFSET)){M_OFFSET = 0.0f;}
+  if(isnan(I_BW) || I_BW==-1){I_BW = 1000;}
+  if(isnan(I_MAX) || I_MAX ==-1){I_MAX=40;}
+  if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=12;}
+  if(CAN_ID==-1){CAN_ID = 1;}
+  if(CAN_MASTER==-1){CAN_MASTER = 0;}
+  if(CAN_TIMEOUT==-1){CAN_TIMEOUT = 1000;}
+  if(isnan(R_NOMINAL) || R_NOMINAL==-1){R_NOMINAL = 0.0f;}
+  if(isnan(TEMP_MAX) || TEMP_MAX==-1){TEMP_MAX = 125.0f;}
+  if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
 
+  printf("Version Number: %.2f\r\n", VERSION_NUM);
   /*
   printf("Hello\r\n");
   printf("Floats: %f  %f  %f\r\n", __float_reg[0], __float_reg[1], __float_reg[2]);
@@ -160,6 +173,9 @@ int main(void)
 
 */
 
+  HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
+  HAL_TIM_Base_Start_IT(&htim1);
+
   /* USER CODE END 2 */
  
  
@@ -169,7 +185,7 @@ int main(void)
   while (1)
   {
 	  //HAL_Delay(200);
-	  //printf("Main Loop Count:  %d\r\n", state.state_change);
+	  //printf("Main Loop Count:  %d\r\n", controller.loop_count);
 
 	  //printf("Main Loop Serial: %d", Serial2RxBuffer[1]);
     /* USER CODE END WHILE */
