@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include "stm32f4xx_flash.h"
 #include "flash_writer.h"
-//#include "preference_writer.h"
+#include "preference_writer.h"
 #include "user_config.h"
 #include "fsm.h"
 /* USER CODE END Includes */
@@ -68,9 +68,7 @@
 /* Flash Registers */
 float __float_reg[64];
 int __int_reg[256];
-//PreferenceWriter prefs(6);
-
-FlashWriter flash;
+PreferenceWriter prefs;
 
 int count = 0;
 
@@ -138,21 +136,29 @@ int main(void)
   MX_ADC3_Init();
   /* USER CODE BEGIN 2 */
 
+
+
+  preference_writer_init(&prefs, 6);
+  preference_writer_load(prefs);
+
+  /*
   printf("Hello\r\n");
+  printf("Floats: %f  %f  %f\r\n", __float_reg[0], __float_reg[1], __float_reg[2]);
+  printf("Ints:   %d  %d  %d\r\n", __int_reg[0], __int_reg[1], __int_reg[2]);
 
-  flash_writer_init(&flash, 6);
+  __float_reg[0] = 0.0f;
+  __float_reg[1] = 1.1f;
+  __float_reg[2] = 2.2f;
+  __int_reg[0] = 0;
+  __int_reg[1] = 1;
+  __int_reg[2] = 2;
 
-  flash_writer_open(&flash);
-  //flash_writer_write_uint(flash, 14, 1234567);
-  flash_writer_write_float(flash, 14, 12.34567);
+  //if(!preference_writer_ready(prefs)) preference_writer_open(&prefs);
+  preference_writer_open(&prefs);
+  preference_writer_flush(&prefs);
+  preference_writer_close(&prefs);
 
-  flash_writer_close(&flash);
-
-  //uint32_t flash_data = flash_read_uint(flash, 14);
-  float flash_data = flash_read_float(flash, 14);
-
-  //printf("Flash value: %u\r\n", flash_data);
-  printf("Flash value: %f\r\n", flash_data);
+*/
 
   /* USER CODE END 2 */
  
