@@ -4,6 +4,8 @@
 "Core/Src/fsm.o"
 "Core/Src/gpio.o"
 "Core/Src/main.o"
+"Core/Src/math_ops.o"
+"Core/Src/position_sensor.o"
 "Core/Src/preference_writer.o"
 "Core/Src/spi.o"
 "Core/Src/stm32f4xx_flash.o"

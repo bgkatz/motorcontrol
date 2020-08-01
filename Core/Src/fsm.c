@@ -12,6 +12,7 @@
 #include "user_config.h"
 
  void run_fsm(FSMStruct * fsmstate){
+	 /* run_smf is run every commutation interrupt cycle */
 	 if(fsmstate->state_change){
 		 printf("FSM State %d\r\n", fsmstate->state);
 	 }
@@ -44,7 +45,9 @@
 
 
  void update_fsm(FSMStruct * fsmstate, char fsm_input){
-
+	 /*update_fsm is only run when new state-change information is received
+	  * on serial terminal input or CAN input
+	  */
 	if(fsm_input == 27){	// escape to exit do rest mode
 		fsmstate->state = MENU_MODE;
 		fsmstate->state_change = 1;

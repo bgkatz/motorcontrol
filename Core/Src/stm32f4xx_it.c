@@ -27,6 +27,8 @@
 #include "structs.h"
 #include "usart.h"
 #include "fsm.h"
+#include "spi.h"
+#include "gpio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -225,13 +227,25 @@ void TIM1_UP_TIM10_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
 
 	// FOC: update sensors //
+	//ADC1->CR2  |= 0x40000000;
+	//controller.adc2_raw = ADC2->DR;                                         // Read ADC Data Registers
+	//controller.adc1_raw = ADC1->DR;
+	//controller.adc3_raw = ADC3->DR;
+
+	comm_encoder.spi_tx_word = 0x0000;
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET ); // NSS1 low
+	HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)comm_encoder.spi_tx_buff, (uint8_t *)comm_encoder.spi_rx_buff, 1, 100);
+	while( hspi1.State == HAL_SPI_STATE_BUSY );  // wait xmission complete
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET ); // NSS1 high
+
+
 
 	run_fsm(&state);
 	//state.state_change = 0; //delete me later
 
 	controller.loop_count++;
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
-	HAL_TIM_IRQHandler(&htim1);
+  HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
 }

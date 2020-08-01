@@ -61,11 +61,27 @@ typedef struct{
     float delta_t;											// Temperature rise
     }   ObserverStruct;
 
+typedef struct{
+	union{
+		uint8_t spi_tx_buff[2];
+		uint16_t spi_tx_word;
+	};
+	union{
+		uint8_t spi_rx_buff[2];
+		uint16_t spi_rx_word;
+	};
+	float angle, elec_angle, zero_offset, elec_zero_offset, velocity;
+	int count, cpr, rotations;
+	int offset_lut[128];
+	uint8_t first_sample;
+} EncoderStruct;
+
 /* Global Structs */
 extern ControllerStruct controller;
 extern ObserverStruct observer;
 extern COMStruct com;
 extern FSMStruct state;
+extern EncoderStruct comm_encoder;
 
 #ifdef __cplusplus
 }
