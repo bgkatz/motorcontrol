@@ -82,7 +82,7 @@
                 //    prefs.close();
                 //    prefs.load();
                 //spi.SetMechOffset(M_OFFSET);
-                printf("\n\r  Saved new zero position:  %.4f\n\r\n\r", M_OFFSET);
+                printf("\n\r  Saved new zero position:  %.4f\n\r\n\r", M_ZERO);
                 break;
             }
 		break;

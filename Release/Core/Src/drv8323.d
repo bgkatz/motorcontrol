@@ -1,4 +1,5 @@
-Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
+Core/Src/drv8323.o: ../Core/Src/drv8323.c ../Core/Inc/drv8323.h \
+ ../Core/Inc/spi.h ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -31,10 +32,11 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/stm32f4xx_it.h ../Core/Inc/structs.h ../Core/Inc/spi.h \
- ../Core/Inc/main.h ../Core/Inc/gpio.h ../Core/Inc/usart.h \
- ../Core/Inc/fsm.h ../Core/Inc/structs.h ../Core/Inc/spi.h \
- ../Core/Inc/gpio.h ../Core/Inc/position_sensor.h
+ ../Core/Inc/structs.h ../Core/Inc/gpio.h ../Core/Inc/usart.h
+
+../Core/Inc/drv8323.h:
+
+../Core/Inc/spi.h:
 
 ../Core/Inc/main.h:
 
@@ -102,24 +104,8 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-../Core/Inc/stm32f4xx_it.h:
-
 ../Core/Inc/structs.h:
-
-../Core/Inc/spi.h:
-
-../Core/Inc/main.h:
 
 ../Core/Inc/gpio.h:
 
 ../Core/Inc/usart.h:
-
-../Core/Inc/fsm.h:
-
-../Core/Inc/structs.h:
-
-../Core/Inc/spi.h:
-
-../Core/Inc/gpio.h:
-
-../Core/Inc/position_sensor.h:

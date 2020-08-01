@@ -11,8 +11,12 @@
 extern "C" {
 #endif
 
+#define N_POS_SAMPLES 20		// Number of position samples to store.  should put this somewhere else...
+
 
 #include <stdint.h>
+#include "spi.h"
+#include "gpio.h"
 
 typedef struct{
     } GPIOStruct;
@@ -62,6 +66,9 @@ typedef struct{
     }   ObserverStruct;
 
 typedef struct{
+	SPI_HandleTypeDef hspi;
+	GPIO_TypeDef* cs_gpio;
+	uint16_t cs_pin;
 	union{
 		uint8_t spi_tx_buff[2];
 		uint16_t spi_tx_word;
@@ -70,11 +77,31 @@ typedef struct{
 		uint8_t spi_rx_buff[2];
 		uint16_t spi_rx_word;
 	};
-	float angle, elec_angle, zero_offset, elec_zero_offset, velocity;
-	int count, cpr, rotations;
+	float angle_singleturn, angle_multiturn[N_POS_SAMPLES], old_angle_multiturn, elec_angle, velocity, vel2, ppairs;
+	int raw, count, old_count, cpr, turns;
+	int m_zero, e_zero;
 	int offset_lut[128];
 	uint8_t first_sample;
 } EncoderStruct;
+
+typedef struct{
+	SPI_HandleTypeDef hspi;
+	GPIO_TypeDef* cs_gpio;
+	uint16_t cs_pin;
+	union{
+		uint8_t spi_tx_buff[2];
+		uint16_t spi_tx_word;
+	};
+	union{
+		uint8_t spi_rx_buff[2];
+		uint16_t spi_rx_word;
+	};
+	uint16_t fault;
+} DRVStruct;
+
+
+
+
 
 /* Global Structs */
 extern ControllerStruct controller;
@@ -82,6 +109,7 @@ extern ObserverStruct observer;
 extern COMStruct com;
 extern FSMStruct state;
 extern EncoderStruct comm_encoder;
+extern DRVStruct drv;
 
 #ifdef __cplusplus
 }

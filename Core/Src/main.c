@@ -37,11 +37,16 @@
 /* USER CODE BEGIN Includes */
 #include "structs.h"
 #include <stdio.h>
+#include <string.h>
+
 #include "stm32f4xx_flash.h"
 #include "flash_writer.h"
+#include "position_sensor.h"
 #include "preference_writer.h"
 #include "user_config.h"
 #include "fsm.h"
+#include "drv8323.h"
+#include "math_ops.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -79,6 +84,7 @@ ObserverStruct observer;
 COMStruct com;
 FSMStruct state;
 EncoderStruct comm_encoder;
+DRVStruct drv;
 
 
 uint8_t Serial2RxBuffer[1];
@@ -143,8 +149,8 @@ int main(void)
   preference_writer_init(&prefs, 6);
   preference_writer_load(prefs);
   /* Sanitize configs in case flash is empty*/
-  if(isnan(E_OFFSET)){E_OFFSET = 0.0f;}
-  if(isnan(M_OFFSET)){M_OFFSET = 0.0f;}
+  if(E_ZERO==-1){E_ZERO = 0;}
+  if(M_ZERO==-1){M_ZERO = 0;}
   if(isnan(I_BW) || I_BW==-1){I_BW = 1000;}
   if(isnan(I_MAX) || I_MAX ==-1){I_MAX=40;}
   if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=12;}
@@ -154,6 +160,7 @@ int main(void)
   if(isnan(R_NOMINAL) || R_NOMINAL==-1){R_NOMINAL = 0.0f;}
   if(isnan(TEMP_MAX) || TEMP_MAX==-1){TEMP_MAX = 125.0f;}
   if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
+  if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
 
   printf("Version Number: %.2f\r\n", VERSION_NUM);
 
@@ -176,8 +183,43 @@ int main(void)
 
 */
 
+
+
+  /* commutation encoder setup */
+  comm_encoder.hspi = hspi3;				// SPI handle
+  comm_encoder.cs_gpio = GPIOA;				// SPI CS GPIO
+  comm_encoder.cs_pin = GPIO_PIN_15;		// SPI CS pin number
+  comm_encoder.cpr = 65536;					// encoder counts per revolution
+  comm_encoder.m_zero = M_ZERO;
+  comm_encoder.e_zero = E_ZERO;
+  comm_encoder.ppairs = PPAIRS;
+  ps_warmup(&comm_encoder, 100);
+  memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));	// Copy the linearization lookup table
+  memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
+
+  /* DRV8323 setup */
+  drv.hspi = hspi1;				// SPI handle
+  drv.cs_gpio = GPIOA;			// SPI CS GPIO
+  drv.cs_pin = GPIO_PIN_4;		// SPI CS pin number
+
+
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET );
+  drv_calibrate(drv);
+  drv_write_DCR(drv, 0x0, DIS_GDF_DIS, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1);
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x1, 0x1, 0x1, SEN_LVL_1_0);   // calibrate shunt amplifiers
+  //drv_zero_current(&controller.adc1_offset, &controller.adc2_offset);
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x1, 0x0, 0x0, 0x0, SEN_LVL_1_0);
+  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_NONE, OCP_DEG_8US, VDS_LVL_1_88);
+  drv_disable_gd(drv);
+  HAL_Delay(10);
+  printf("DCR: %d\r\n", drv_read_register(drv, DCR));
+  drv_enable_gd(drv);
+  printf("DCR: %d\r\n", drv_read_register(drv, DCR));
+
+  /* Turn on interrupts */
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
   HAL_TIM_Base_Start_IT(&htim1);
+
 
   /* USER CODE END 2 */
  
@@ -187,9 +229,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_Delay(50);
+	  HAL_Delay(100);
+	  drv_print_faults(drv);
 	  //printf("hello\r\n");
-	  printf("%d\r\n", comm_encoder.spi_rx_word);
+	  //printf("%f  %f  %f\r\n", comm_encoder.angle_multiturn[0], comm_encoder.velocity, comm_encoder.vel2);
+	  //ps_sample(&comm_encoder, .000025f);
+	  //for(int i = 0; i<N_POS_SAMPLES; i++){ printf(" %.2f", comm_encoder.angle_multiturn[i]);}
+	  //printf("\r\n");
 
 	  //printf("Main Loop Serial: %d", Serial2RxBuffer[1]);
     /* USER CODE END WHILE */

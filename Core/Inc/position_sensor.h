@@ -8,8 +8,11 @@
 #ifndef INC_POSITION_SENSOR_H_
 #define INC_POSITION_SENSOR_H_
 
-#include "structs.h"
 
-void sample(EncoderStruct * encoder, float dt);
+#include "structs.h"
+#include "spi.h"
+
+void ps_warmup(EncoderStruct * encoder, int n);
+void ps_sample(EncoderStruct * encoder, float dt);
 
 #endif /* INC_POSITION_SENSOR_H_ */
