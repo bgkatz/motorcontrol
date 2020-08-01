@@ -1,0 +1,10 @@
+FlashWriter.cpp:4:1:FlashWriter::FlashWriter(int)	16	static
+FlashWriter.cpp:11:6:bool FlashWriter::ready()	16	static
+FlashWriter.cpp:15:6:void FlashWriter::open()	16	static
+FlashWriter.cpp:22:6:void FlashWriter::write(uint32_t, int)	32	static
+FlashWriter.cpp:28:6:void FlashWriter::write(uint32_t, unsigned int)	24	static
+FlashWriter.cpp:32:6:void FlashWriter::write(uint32_t, float)	32	static
+FlashWriter.cpp:38:6:void FlashWriter::close()	16	static
+FlashWriter.cpp:43:5:int flashReadInt(uint32_t, uint32_t)	16	static
+FlashWriter.cpp:47:10:uint32_t flashReadUint(uint32_t, uint32_t)	16	static
+FlashWriter.cpp:51:7:float flashReadFloat(uint32_t, uint32_t)	16	static

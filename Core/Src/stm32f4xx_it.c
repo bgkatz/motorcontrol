@@ -233,10 +233,10 @@ void TIM1_UP_TIM10_IRQHandler(void)
 	//controller.adc3_raw = ADC3->DR;
 
 	comm_encoder.spi_tx_word = 0x0000;
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET ); // NSS1 low
-	HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)comm_encoder.spi_tx_buff, (uint8_t *)comm_encoder.spi_rx_buff, 1, 100);
-	while( hspi1.State == HAL_SPI_STATE_BUSY );  // wait xmission complete
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET ); // NSS1 high
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_RESET ); // NSS1 low
+	HAL_SPI_TransmitReceive(&hspi3, (uint8_t*)comm_encoder.spi_tx_buff, (uint8_t *)comm_encoder.spi_rx_buff, 1, 100);
+	while( hspi3.State == HAL_SPI_STATE_BUSY );  // wait xmission complete
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_15, GPIO_PIN_SET ); // NSS1 high
 
 
 

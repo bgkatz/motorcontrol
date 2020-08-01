@@ -156,6 +156,7 @@ int main(void)
   if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
 
   printf("Version Number: %.2f\r\n", VERSION_NUM);
+
   /*
   printf("Hello\r\n");
   printf("Floats: %f  %f  %f\r\n", __float_reg[0], __float_reg[1], __float_reg[2]);
@@ -186,8 +187,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  //HAL_Delay(200);
-	  //printf("Main Loop Count:  %d\r\n", controller.loop_count);
+	  HAL_Delay(50);
+	  //printf("hello\r\n");
+	  printf("%d\r\n", comm_encoder.spi_rx_word);
 
 	  //printf("Main Loop Serial: %d", Serial2RxBuffer[1]);
     /* USER CODE END WHILE */

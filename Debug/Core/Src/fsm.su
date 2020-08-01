@@ -1,0 +1,6 @@
+fsm.c:14:7:run_fsm	16	static
+fsm.c:47:7:update_fsm	24	static
+fsm.c:100:7:enter_menu_state	8	static
+fsm.c:116:7:enter_setup_state	32	static
+fsm.c:130:7:calibrate	4	static
+fsm.c:134:7:enter_torque_mode	4	static

@@ -56,8 +56,8 @@ motorcontrol.bin \
 all: motorcontrol.elf secondary-outputs
 
 # Tool invocations
-motorcontrol.elf: $(OBJS) $(USER_OBJS) C:\Users\Ben\Documents\motorcontrol\STM32F446RETX_FLASH.ld
-	arm-none-eabi-g++ -o "motorcontrol.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Ben\Documents\motorcontrol\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="motorcontrol.map" -Wl,--gc-sections -static  -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+motorcontrol.elf: $(OBJS) $(USER_OBJS) C:\Users\ben\Documents\motorcontrol\STM32F446RETX_FLASH.ld
+	arm-none-eabi-g++ -o "motorcontrol.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ben\Documents\motorcontrol\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="motorcontrol.map" -Wl,--gc-sections -static  -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

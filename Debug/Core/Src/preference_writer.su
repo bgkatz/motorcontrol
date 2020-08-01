@@ -1,0 +1,8 @@
+preference_writer.c:20:6:preference_writer_init	16	static
+preference_writer.c:26:6:preference_writer_open	16	static
+preference_writer.c:31:7:preference_writer_ready	8	static
+preference_writer.c:35:6:preference_writer_write_int	16	static
+preference_writer.c:39:6:preference_writer_write_float	16	static
+preference_writer.c:43:6:preference_writer_flush	32	static
+preference_writer.c:54:6:preference_writer_load	24	static
+preference_writer.c:64:6:preference_writer_close	16	static
