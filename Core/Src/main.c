@@ -229,8 +229,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
 	  HAL_Delay(100);
 	  drv_print_faults(drv);
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
+	  HAL_Delay(100);
+	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );
 	  //printf("hello\r\n");
 	  //printf("%f  %f  %f\r\n", comm_encoder.angle_multiturn[0], comm_encoder.velocity, comm_encoder.vel2);
 	  //ps_sample(&comm_encoder, .000025f);

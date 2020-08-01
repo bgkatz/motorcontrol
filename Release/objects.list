@@ -12,6 +12,8 @@
 "Core/Src/stm32f4xx_flash.o"
 "Core/Src/stm32f4xx_hal_msp.o"
 "Core/Src/stm32f4xx_it.o"
+"Core/Src/syscalls.o"
+"Core/Src/sysmem.o"
 "Core/Src/system_stm32f4xx.o"
 "Core/Src/tim.o"
 "Core/Src/usart.o"
