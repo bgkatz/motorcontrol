@@ -16,21 +16,21 @@ uint16_t drv_spi_write(DRVStruct * drv, uint16_t val){
 	HAL_SPI_TransmitReceive(&drv->hspi, (uint8_t*)drv->spi_tx_buff, (uint8_t *)drv->spi_rx_buff, 1, 100);
 	while( drv->hspi.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
 	HAL_GPIO_WritePin(drv->cs_gpio, drv->cs_pin, GPIO_PIN_SET ); 	// CS high
-	return drv ->spi_rx_word;
+	return drv->spi_rx_word;
 }
-int drv_read_FSR1(DRVStruct drv){
-	return drv_spi_write(&drv, (1<<15) | FSR1);
-}
-
-int drv_read_FSR2(DRVStruct drv){
-	return drv_spi_write(&drv, (1<<15) | FSR2);
+uint16_t drv_read_FSR1(DRVStruct drv){
+	return drv_spi_write(&drv, (1<<15)|FSR1);
 }
 
-int drv_read_register(DRVStruct drv, int reg){
-	return drv_spi_write(&drv, (1<<15) | (reg<<11));
+uint16_t drv_read_FSR2(DRVStruct drv){
+	return drv_spi_write(&drv, (1<<15)|FSR2);
+}
+
+uint16_t drv_read_register(DRVStruct drv, int reg){
+	return drv_spi_write(&drv, (1<<15)|(reg<<11));
 }
 void drv_write_register(DRVStruct drv, int reg, int val){
-	drv_spi_write(&drv, (reg<<11) | val);
+	drv_spi_write(&drv, (reg<<11)|val);
 }
 void drv_write_DCR(DRVStruct drv, int DIS_CPUV, int DIS_GDF, int OTW_REP, int PWM_MODE, int PWM_COM, int PWM_DIR, int COAST, int BRAKE, int CLR_FLT){
 	uint16_t val = (DCR<<11) | (DIS_CPUV<<9) | (DIS_GDF<<8) | (OTW_REP<<7) | (PWM_MODE<<5) | (PWM_COM<<4) | (PWM_DIR<<3) | (COAST<<2) | (BRAKE<<1) | CLR_FLT;

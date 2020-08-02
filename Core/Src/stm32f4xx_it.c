@@ -234,6 +234,9 @@ void TIM1_UP_TIM10_IRQHandler(void)
 	//controller.adc3_raw = ADC3->DR;
 
 	ps_sample(&comm_encoder, .000025f);
+	TIM1->CCR3 = (0x8CA>>1)*(0.5f);
+	TIM1->CCR2 = (0x8CA>>1)*(0.5f);
+	TIM1->CCR1 = (0x8CA>>1)*(0.5f);
 
 	run_fsm(&state);
 	//state.state_change = 0; //delete me later

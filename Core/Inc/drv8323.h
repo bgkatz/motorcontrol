@@ -162,9 +162,9 @@
 #define SEN_LVL_1_0         0x3
 
 uint16_t drv_spi_write(DRVStruct * drv, uint16_t val);
-int drv_read_FSR1(DRVStruct drv);
-int drv_read_FSR2(DRVStruct drv);
-int drv_read_register(DRVStruct drv, int reg);
+uint16_t drv_read_FSR1(DRVStruct drv);
+uint16_t drv_read_FSR2(DRVStruct drv);
+uint16_t drv_read_register(DRVStruct drv, int reg);
 void drv_write_register(DRVStruct drv, int reg, int val);
 void drv_write_DCR(DRVStruct drv, int DIS_CPUV, int DIS_GDF, int OTW_REP, int PWM_MODE, int PWM_COM, int PWM_DIR, int COAST, int BRAKE, int CLR_FLT);
 void drv_write_HSR(DRVStruct drv, int LOCK, int IDRIVEP_HS, int IDRIVEN_HS);

@@ -1,7 +1,7 @@
 drv8323.c:13:10:drv_spi_write	16	static
-drv8323.c:21:5:drv_read_FSR1	8	static
-drv8323.c:25:5:drv_read_FSR2	8	static
-drv8323.c:29:5:drv_read_register	8	static
+drv8323.c:21:10:drv_read_FSR1	8	static
+drv8323.c:25:10:drv_read_FSR2	8	static
+drv8323.c:29:10:drv_read_register	8	static
 drv8323.c:32:6:drv_write_register	8	static
 drv8323.c:35:6:drv_write_DCR	8	static
 drv8323.c:39:6:drv_write_HSR	8	static

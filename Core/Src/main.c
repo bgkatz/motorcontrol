@@ -162,7 +162,7 @@ int main(void)
   if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
   if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
 
-  printf("Version Number: %.2f\r\n", VERSION_NUM);
+  printf("\r\nVersion Number: %.2f\r\n", VERSION_NUM);
 
   /*
   printf("Hello\r\n");
@@ -202,21 +202,25 @@ int main(void)
   drv.cs_gpio = GPIOA;			// SPI CS GPIO
   drv.cs_pin = GPIO_PIN_4;		// SPI CS pin number
 
-
+  HAL_GPIO_WritePin(drv.cs_gpio, drv.cs_pin, GPIO_PIN_SET ); 	// CS high
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET );
   drv_calibrate(drv);
   drv_write_DCR(drv, 0x0, DIS_GDF_DIS, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1);
-  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x1, 0x1, 0x1, SEN_LVL_1_0);   // calibrate shunt amplifiers
-  //drv_zero_current(&controller.adc1_offset, &controller.adc2_offset);
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x1, 0x1, 0x1, SEN_LVL_1_0);
+  //zero_current(&controller.adc1_offset, &controller.adc2_offset);
+  HAL_Delay(1);
   drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x1, 0x0, 0x0, 0x0, SEN_LVL_1_0);
   drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_NONE, OCP_DEG_8US, VDS_LVL_1_88);
   drv_disable_gd(drv);
-  HAL_Delay(10);
-  printf("DCR: %d\r\n", drv_read_register(drv, DCR));
   drv_enable_gd(drv);
-  printf("DCR: %d\r\n", drv_read_register(drv, DCR));
 
-  /* Turn on interrupts */
+
+  /* Turn on PWM, interrupts */
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+
+
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
   HAL_TIM_Base_Start_IT(&htim1);
 
@@ -232,9 +236,9 @@ int main(void)
 
 	  HAL_Delay(100);
 	  drv_print_faults(drv);
-	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
-	  HAL_Delay(100);
-	  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );
+	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
+	  //HAL_Delay(100);
+	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );
 	  //printf("hello\r\n");
 	  //printf("%f  %f  %f\r\n", comm_encoder.angle_multiturn[0], comm_encoder.velocity, comm_encoder.vel2);
 	  //ps_sample(&comm_encoder, .000025f);
