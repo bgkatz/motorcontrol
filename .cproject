@@ -179,8 +179,6 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.1333564725.367873065" name="preference_writer.h" rcbsApplicability="disable" resourcePath="Core/Inc/preference_writer.h" toolsToInvoke=""/>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.1333564725.2016040344" name="PreferenceWriter.h" rcbsApplicability="disable" resourcePath="Core/Inc/PreferenceWriter.h" toolsToInvoke=""/>
-					<fileInfo id="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.1333564725.1719281328" name="FlashWriter.h" rcbsApplicability="disable" resourcePath="Core/Inc/FlashWriter.h" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry excluding="Src/FlashWriter.cpp|Src/PrefrenceWriter.cpp|Inc/FlashWriter.h|Inc/PreferenceWriter.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>

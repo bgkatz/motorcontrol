@@ -1,0 +1,14 @@
+foc.c:15:6:set_dtc	0	static
+foc.c:30:6:abc	40	static
+foc.c:44:6:dq0	40	static
+foc.c:57:6:svm	56	static
+foc.c:74:6:zero_current	32	static
+foc.c:95:6:init_controller_params	0	static
+foc.c:109:6:reset_foc	0	static
+foc.c:127:6:reset_observer	0	static
+foc.c:135:6:limit_current_ref	0	static
+foc.c:143:6:update_observer	0	static
+foc.c:175:7:linearize_dtc	0	static
+foc.c:186:6:field_weaken	0	static
+foc.c:199:6:commutate	0	static
+foc.c:299:6:torque_control	0	static

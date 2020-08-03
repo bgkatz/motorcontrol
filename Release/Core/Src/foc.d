@@ -1,4 +1,5 @@
-Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
+Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h ../Core/Inc/structs.h \
+ ../Core/Inc/spi.h ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -31,12 +32,15 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/stm32f4xx_it.h ../Core/Inc/structs.h ../Core/Inc/spi.h \
- ../Core/Inc/main.h ../Core/Inc/gpio.h ../Core/Inc/adc.h \
- ../Core/Inc/tim.h ../Core/Inc/usart.h ../Core/Inc/fsm.h \
- ../Core/Inc/structs.h ../Core/Inc/spi.h ../Core/Inc/gpio.h \
- ../Core/Inc/adc.h ../Core/Inc/foc.h ../Core/Inc/position_sensor.h \
+ ../Core/Inc/gpio.h ../Core/Inc/adc.h ../Core/Inc/tim.h ../Core/Inc/adc.h \
+ ../Core/Inc/tim.h ../Core/Inc/position_sensor.h ../Core/Inc/math_ops.h \
  ../Core/Inc/hw_config.h
+
+../Core/Inc/foc.h:
+
+../Core/Inc/structs.h:
+
+../Core/Inc/spi.h:
 
 ../Core/Inc/main.h:
 
@@ -104,34 +108,18 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c ../Core/Inc/main.h \
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-../Core/Inc/stm32f4xx_it.h:
-
-../Core/Inc/structs.h:
-
-../Core/Inc/spi.h:
-
-../Core/Inc/main.h:
-
 ../Core/Inc/gpio.h:
 
 ../Core/Inc/adc.h:
 
 ../Core/Inc/tim.h:
 
-../Core/Inc/usart.h:
-
-../Core/Inc/fsm.h:
-
-../Core/Inc/structs.h:
-
-../Core/Inc/spi.h:
-
-../Core/Inc/gpio.h:
-
 ../Core/Inc/adc.h:
 
-../Core/Inc/foc.h:
+../Core/Inc/tim.h:
 
 ../Core/Inc/position_sensor.h:
+
+../Core/Inc/math_ops.h:
 
 ../Core/Inc/hw_config.h:

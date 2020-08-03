@@ -32,6 +32,8 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "foc.h"
+#include "hw_config.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -145,9 +147,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 
-
+  /* Load settings from flash */
   preference_writer_init(&prefs, 6);
   preference_writer_load(prefs);
+
   /* Sanitize configs in case flash is empty*/
   if(E_ZERO==-1){E_ZERO = 0;}
   if(M_ZERO==-1){M_ZERO = 0;}
@@ -162,28 +165,23 @@ int main(void)
   if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
   if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
 
-  printf("\r\nVersion Number: %.2f\r\n", VERSION_NUM);
+  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
 
-  /*
-  printf("Hello\r\n");
-  printf("Floats: %f  %f  %f\r\n", __float_reg[0], __float_reg[1], __float_reg[2]);
-  printf("Ints:   %d  %d  %d\r\n", __int_reg[0], __int_reg[1], __int_reg[2]);
-
-  __float_reg[0] = 0.0f;
-  __float_reg[1] = 1.1f;
-  __float_reg[2] = 2.2f;
-  __int_reg[0] = 0;
-  __int_reg[1] = 1;
-  __int_reg[2] = 2;
-
-  //if(!preference_writer_ready(prefs)) preference_writer_open(&prefs);
-  preference_writer_open(&prefs);
-  preference_writer_flush(&prefs);
-  preference_writer_close(&prefs);
-
-*/
-
-
+  /* Controller Setup */
+  controller.adc_1 = hadc1;					// ADC handles
+  controller.adc_2 = hadc2;
+  controller.adc_3 = hadc3;
+  if(PHASE_ORDER){							// Timer channel to phase mapping
+	  controller.tim_ch_u = TIM_CHANNEL_3;
+	  controller.tim_ch_v = TIM_CHANNEL_2;
+	  controller.tim_ch_w = TIM_CHANNEL_1;
+  }
+  else{
+	  controller.tim_ch_u = TIM_CHANNEL_3;
+	  controller.tim_ch_v = TIM_CHANNEL_1;
+	  controller.tim_ch_w = TIM_CHANNEL_2;
+  }
+  controller.invert_dtc = 0;		// 1 = invert duty cycle, 0 = don't.
 
   /* commutation encoder setup */
   comm_encoder.hspi = hspi3;				// SPI handle
@@ -193,21 +191,24 @@ int main(void)
   comm_encoder.m_zero = M_ZERO;
   comm_encoder.e_zero = E_ZERO;
   comm_encoder.ppairs = PPAIRS;
-  ps_warmup(&comm_encoder, 100);
+  ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
   memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));	// Copy the linearization lookup table
-  memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
+  memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut)); //delete me later
+
+  /* Turn on ADCs */
+  HAL_ADC_Start(&hadc1);
+  HAL_ADC_Start(&hadc2);
+  HAL_ADC_Start(&hadc3);
 
   /* DRV8323 setup */
-  drv.hspi = hspi1;				// SPI handle
-  drv.cs_gpio = GPIOA;			// SPI CS GPIO
-  drv.cs_pin = GPIO_PIN_4;		// SPI CS pin number
 
-  HAL_GPIO_WritePin(drv.cs_gpio, drv.cs_pin, GPIO_PIN_SET ); 	// CS high
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_11, GPIO_PIN_SET );
+  HAL_GPIO_WritePin(DRV_CS, GPIO_PIN_SET ); 	// CS high
+  HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
   drv_calibrate(drv);
   drv_write_DCR(drv, 0x0, DIS_GDF_DIS, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1);
   drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x1, 0x1, 0x1, SEN_LVL_1_0);
-  //zero_current(&controller.adc1_offset, &controller.adc2_offset);
+  zero_current(&controller);
+  printf("ADC 1 OFFSET: %d     ADC 2 OFFSET: %d\r\n", controller.adc1_offset, controller.adc2_offset);
   HAL_Delay(1);
   drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x1, 0x0, 0x0, 0x0, SEN_LVL_1_0);
   drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_NONE, OCP_DEG_8US, VDS_LVL_1_88);
@@ -215,14 +216,15 @@ int main(void)
   drv_enable_gd(drv);
 
 
-  /* Turn on PWM, interrupts */
+  /* Turn on PWM */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
 
-
+  /* Turn on interrupts */
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
   HAL_TIM_Base_Start_IT(&htim1);
+
 
 
   /* USER CODE END 2 */
@@ -235,7 +237,8 @@ int main(void)
   {
 
 	  HAL_Delay(100);
-	  drv_print_faults(drv);
+	 //printf("%d  %d  %d\r\n", controller.adc1_raw, controller.adc2_raw, controller.adc3_raw);
+	  //drv_print_faults(drv);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
 	  //HAL_Delay(100);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );

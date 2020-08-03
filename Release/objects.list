@@ -2,6 +2,7 @@
 "Core/Src/can.o"
 "Core/Src/drv8323.o"
 "Core/Src/flash_writer.o"
+"Core/Src/foc.o"
 "Core/Src/fsm.o"
 "Core/Src/gpio.o"
 "Core/Src/main.o"

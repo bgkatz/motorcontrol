@@ -26,7 +26,8 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 	/* Shift around previous samples */
 	encoder->old_count = encoder->count;
-	memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float));
+	for(int i = 1; i<N_POS_SAMPLES; i++){encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];}
+	//memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float)); // this is much slower for some reason
 
 	/* SPI read/write */
 	encoder->spi_tx_word = 0x0000;
@@ -43,8 +44,8 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->count = encoder->raw + off_interp;
 
 	/* Real angles in radians */
-	encoder->angle_singleturn = 2.0f*M_PI*fmod(((float)(encoder->count-encoder->m_zero))/((float)encoder->cpr), 1.0f);
-	encoder->elec_angle = 2.0f*M_PI*fmod((encoder->ppairs*(float)(encoder->count-encoder->e_zero))/((float)encoder->cpr), 1.0f);
+	encoder->angle_singleturn = 2.0f*PI_F*fmodf(((float)(encoder->count-encoder->m_zero))/((float)encoder->cpr), 1.0f);
+	encoder->elec_angle = 2.0f*PI_F*fmodf((encoder->ppairs*(float)(encoder->count-encoder->e_zero))/((float)encoder->cpr), 1.0f);
 
 	/* Rollover */
 	int count_diff = encoder->count - encoder->old_count;
@@ -52,7 +53,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	else if(count_diff < -encoder->cpr>>1){encoder->turns++;}
 
 	/* Multi-turn position */
-	encoder->angle_multiturn[0] = encoder->angle_singleturn + 2.0f*M_PI*(float)encoder->turns;
+	encoder->angle_multiturn[0] = encoder->angle_singleturn + 2.0f*PI_F*(float)encoder->turns;
 
 	/** Velocity */
 	/*
@@ -65,7 +66,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 	encoder->velocity = vel_sum/(dt*(float)(N_POS_SAMPLES/2)*(float)(N_POS_SAMPLES/2));
 */
-
+/*
 	float m = (float)N_POS_SAMPLES;
 	float w = 1.0f/m;
 	float q = 12.0f/(m*m*m - m);
@@ -75,6 +76,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 		c1 += encoder->angle_multiturn[i]*q*(i - ibar);
 	}
 	encoder->vel2 = -c1/dt;
+	*/
 
 	encoder->velocity = (encoder->angle_multiturn[0] - encoder->angle_multiturn[N_POS_SAMPLES-1])/(dt*(float)N_POS_SAMPLES);
 }

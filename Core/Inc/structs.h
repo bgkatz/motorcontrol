@@ -17,6 +17,8 @@ extern "C" {
 #include <stdint.h>
 #include "spi.h"
 #include "gpio.h"
+#include "adc.h"
+#include "tim.h"
 
 typedef struct{
     } GPIOStruct;
@@ -30,6 +32,13 @@ typedef struct{
 }FSMStruct;
 
 typedef struct{
+	TIM_HandleTypeDef tim;									// ISR/PWM timer handle
+	ADC_HandleTypeDef adc_1;								// Main ADC handle for simultaneous mode
+	ADC_HandleTypeDef adc_2;								// 2nd ADC Channel
+	ADC_HandleTypeDef adc_3;								// 3rd ADC Channel
+	uint32_t	tim_ch_u;								// Terminal U timer channel
+	uint32_t tim_ch_v;								// Terminal V timer channel
+	uint32_t tim_ch_w;								// Terminal W timer channel
     int adc1_raw, adc2_raw, adc3_raw;                       // Raw ADC Values
     float i_a, i_b, i_c;                                    // Phase currents
     float v_bus;                                            // DC link voltage
@@ -53,6 +62,7 @@ typedef struct{
     int otw_flag;                                           // Over-temp warning
     float i_max;											// Maximum current
     float inverter_tab[128];								// Inverter linearization table
+    uint8_t invert_dtc;										// Inverter duty cycle inverting/non-inverting
     } ControllerStruct;
 
 typedef struct{
@@ -85,9 +95,7 @@ typedef struct{
 } EncoderStruct;
 
 typedef struct{
-	SPI_HandleTypeDef hspi;
-	GPIO_TypeDef* cs_gpio;
-	uint16_t cs_pin;
+
 	union{
 		uint8_t spi_tx_buff[2];
 		uint16_t spi_tx_word;

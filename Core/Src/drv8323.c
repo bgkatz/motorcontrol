@@ -9,13 +9,14 @@
 #include "drv8323.h"
 #include <stdio.h>
 #include "usart.h"
+#include "hw_config.h"
 
 uint16_t drv_spi_write(DRVStruct * drv, uint16_t val){
 	drv->spi_tx_word = val;
-	HAL_GPIO_WritePin(drv->cs_gpio, drv->cs_pin, GPIO_PIN_RESET ); 	// CS low
-	HAL_SPI_TransmitReceive(&drv->hspi, (uint8_t*)drv->spi_tx_buff, (uint8_t *)drv->spi_rx_buff, 1, 100);
-	while( drv->hspi.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
-	HAL_GPIO_WritePin(drv->cs_gpio, drv->cs_pin, GPIO_PIN_SET ); 	// CS high
+	HAL_GPIO_WritePin(DRV_CS, GPIO_PIN_RESET ); 	// CS low
+	HAL_SPI_TransmitReceive(&DRV_SPI, (uint8_t*)drv->spi_tx_buff, (uint8_t *)drv->spi_rx_buff, 1, 100);
+	while( DRV_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
+	HAL_GPIO_WritePin(DRV_CS, GPIO_PIN_SET ); 	// CS high
 	return drv->spi_rx_word;
 }
 uint16_t drv_read_FSR1(DRVStruct drv){
