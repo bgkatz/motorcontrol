@@ -168,26 +168,15 @@ int main(void)
   printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
 
   /* Controller Setup */
-  controller.adc_1 = hadc1;					// ADC handles
-  controller.adc_2 = hadc2;
-  controller.adc_3 = hadc3;
   if(PHASE_ORDER){							// Timer channel to phase mapping
-	  controller.tim_ch_u = TIM_CHANNEL_3;
-	  controller.tim_ch_v = TIM_CHANNEL_2;
-	  controller.tim_ch_w = TIM_CHANNEL_1;
+
   }
   else{
-	  controller.tim_ch_u = TIM_CHANNEL_3;
-	  controller.tim_ch_v = TIM_CHANNEL_1;
-	  controller.tim_ch_w = TIM_CHANNEL_2;
+
   }
   controller.invert_dtc = 0;		// 1 = invert duty cycle, 0 = don't.
 
   /* commutation encoder setup */
-  comm_encoder.hspi = hspi3;				// SPI handle
-  comm_encoder.cs_gpio = GPIOA;				// SPI CS GPIO
-  comm_encoder.cs_pin = GPIO_PIN_15;		// SPI CS pin number
-  comm_encoder.cpr = 65536;					// encoder counts per revolution
   comm_encoder.m_zero = M_ZERO;
   comm_encoder.e_zero = E_ZERO;
   comm_encoder.ppairs = PPAIRS;
@@ -208,7 +197,7 @@ int main(void)
   drv_write_DCR(drv, 0x0, DIS_GDF_DIS, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1);
   drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x1, 0x1, 0x1, SEN_LVL_1_0);
   zero_current(&controller);
-  printf("ADC 1 OFFSET: %d     ADC 2 OFFSET: %d\r\n", controller.adc1_offset, controller.adc2_offset);
+  printf("ADC B OFFSET: %d     ADC C OFFSET: %d\r\n", controller.adc_b_offset, controller.adc_c_offset);
   HAL_Delay(1);
   drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x1, 0x0, 0x0, 0x0, SEN_LVL_1_0);
   drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_NONE, OCP_DEG_8US, VDS_LVL_1_88);

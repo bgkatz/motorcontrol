@@ -32,14 +32,8 @@ typedef struct{
 }FSMStruct;
 
 typedef struct{
-	TIM_HandleTypeDef tim;									// ISR/PWM timer handle
-	ADC_HandleTypeDef adc_1;								// Main ADC handle for simultaneous mode
-	ADC_HandleTypeDef adc_2;								// 2nd ADC Channel
-	ADC_HandleTypeDef adc_3;								// 3rd ADC Channel
-	uint32_t	tim_ch_u;								// Terminal U timer channel
-	uint32_t tim_ch_v;								// Terminal V timer channel
 	uint32_t tim_ch_w;								// Terminal W timer channel
-    int adc1_raw, adc2_raw, adc3_raw;                       // Raw ADC Values
+    int adc_b_raw, adc_c_raw, adc_vbus_raw;      // Raw ADC Values
     float i_a, i_b, i_c;                                    // Phase currents
     float v_bus;                                            // DC link voltage
     float theta_mech, theta_elec;                           // Rotor mechanical and electrical angle
@@ -50,7 +44,7 @@ typedef struct{
     float v_u, v_v, v_w;                                    // Terminal voltages
     float k_d, k_q, ki_d, ki_q, alpha;                      // Current loop gains, current reference filter coefficient
     float d_int, q_int;                                     // Current error integrals
-    int adc1_offset, adc2_offset, adc3_offset, adc4_offset; // ADC offsets
+    int adc_b_offset, adc_c_offset, adc_vbus_offset; 		// ADC offsets
     float i_d_ref, i_q_ref, i_d_ref_filt, i_q_ref_filt;     // Current references
     int loop_count;                                         // Degubbing counter
     int timeout;                                            // Watchdog counter
@@ -76,9 +70,7 @@ typedef struct{
     }   ObserverStruct;
 
 typedef struct{
-	SPI_HandleTypeDef hspi;
-	GPIO_TypeDef* cs_gpio;
-	uint16_t cs_pin;
+
 	union{
 		uint8_t spi_tx_buff[2];
 		uint16_t spi_tx_word;
@@ -88,14 +80,13 @@ typedef struct{
 		uint16_t spi_rx_word;
 	};
 	float angle_singleturn, angle_multiturn[N_POS_SAMPLES], old_angle_multiturn, elec_angle, velocity, vel2, ppairs;
-	int raw, count, old_count, cpr, turns;
+	int raw, count, old_count, turns;
 	int m_zero, e_zero;
 	int offset_lut[128];
 	uint8_t first_sample;
 } EncoderStruct;
 
 typedef struct{
-
 	union{
 		uint8_t spi_tx_buff[2];
 		uint16_t spi_tx_word;

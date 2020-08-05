@@ -10,6 +10,8 @@
 #include <stdio.h>
 //#include "PreferenceWriter.h"
 #include "user_config.h"
+#include "structs.h"
+#include "foc.h"
 
  void run_fsm(FSMStruct * fsmstate){
 	 /* run_smf is run every commutation interrupt cycle */
@@ -27,6 +29,10 @@
 	 case CALIBRATION_MODE:
 		 break;
 	 case MOTOR_MODE:
+		 if(fsmstate->state_change){
+			 enter_motor_mode();
+		 	 fsmstate->state_change = 0;
+		 	 }
 		 break;
 	 case SETUP_MODE:
 		 if(fsmstate->state_change){
@@ -131,7 +137,7 @@
 
  }
 
- void enter_torque_mode(void){
+ void enter_motor_mode(void){
 
  }
 

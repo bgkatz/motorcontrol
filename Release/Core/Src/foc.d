@@ -34,7 +34,7 @@ Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h ../Core/Inc/structs.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/gpio.h ../Core/Inc/adc.h ../Core/Inc/tim.h ../Core/Inc/adc.h \
  ../Core/Inc/tim.h ../Core/Inc/position_sensor.h ../Core/Inc/math_ops.h \
- ../Core/Inc/hw_config.h
+ ../Core/Inc/hw_config.h ../Core/Inc/user_config.h
 
 ../Core/Inc/foc.h:
 
@@ -123,3 +123,5 @@ Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h ../Core/Inc/structs.h \
 ../Core/Inc/math_ops.h:
 
 ../Core/Inc/hw_config.h:
+
+../Core/Inc/user_config.h:

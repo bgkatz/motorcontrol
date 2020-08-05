@@ -8,15 +8,16 @@
 #include <string.h>
 #include "position_sensor.h"
 #include "math_ops.h"
+#include "hw_config.h"
 
 void ps_warmup(EncoderStruct * encoder, int n){
 	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
 	for(int i = 0; i<n; i++){
 		encoder->spi_tx_word = 0x0000;
-		HAL_GPIO_WritePin(encoder->cs_gpio, encoder->cs_pin, GPIO_PIN_RESET ); 	// CS low
-		HAL_SPI_TransmitReceive(&encoder->hspi, (uint8_t*)encoder->spi_tx_buff, (uint8_t *)encoder->spi_rx_buff, 1, 100);
-		while( encoder->hspi.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
-		HAL_GPIO_WritePin(encoder->cs_gpio, encoder->cs_pin, GPIO_PIN_SET ); 	// CS high
+		HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+		HAL_SPI_TransmitReceive(&ENC_SPI, (uint8_t*)encoder->spi_tx_buff, (uint8_t *)encoder->spi_rx_buff, 1, 100);
+		while( ENC_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
+		HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
 	}
 }
 
@@ -31,10 +32,10 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 	/* SPI read/write */
 	encoder->spi_tx_word = 0x0000;
-	HAL_GPIO_WritePin(encoder->cs_gpio, encoder->cs_pin, GPIO_PIN_RESET ); 	// CS low
-	HAL_SPI_TransmitReceive(&encoder->hspi, (uint8_t*)encoder->spi_tx_buff, (uint8_t *)encoder->spi_rx_buff, 1, 100);
-	while( encoder->hspi.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
-	HAL_GPIO_WritePin(encoder->cs_gpio, encoder->cs_pin, GPIO_PIN_SET ); 	// CS high
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	HAL_SPI_TransmitReceive(&ENC_SPI, (uint8_t*)encoder->spi_tx_buff, (uint8_t *)encoder->spi_rx_buff, 1, 100);
+	while( ENC_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
 	encoder->raw = encoder ->spi_rx_word;
 
 	/* Linearization */
@@ -44,13 +45,13 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->count = encoder->raw + off_interp;
 
 	/* Real angles in radians */
-	encoder->angle_singleturn = 2.0f*PI_F*fmodf(((float)(encoder->count-encoder->m_zero))/((float)encoder->cpr), 1.0f);
-	encoder->elec_angle = 2.0f*PI_F*fmodf((encoder->ppairs*(float)(encoder->count-encoder->e_zero))/((float)encoder->cpr), 1.0f);
+	encoder->angle_singleturn = 2.0f*PI_F*fmodf(((float)(encoder->count-encoder->m_zero))/((float)ENC_CPR), 1.0f);
+	encoder->elec_angle = 2.0f*PI_F*fmodf((encoder->ppairs*(float)(encoder->count-encoder->e_zero))/((float)ENC_CPR), 1.0f);
 
 	/* Rollover */
 	int count_diff = encoder->count - encoder->old_count;
-	if(count_diff > encoder->cpr>>1){encoder->turns--;}
-	else if(count_diff < -encoder->cpr>>1){encoder->turns++;}
+	if(count_diff > ENC_CPR>>1){encoder->turns--;}
+	else if(count_diff < -ENC_CPR>>1){encoder->turns++;}
 
 	/* Multi-turn position */
 	encoder->angle_multiturn[0] = encoder->angle_singleturn + 2.0f*PI_F*(float)encoder->turns;

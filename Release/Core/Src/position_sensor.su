@@ -1,2 +1,2 @@
-position_sensor.c:12:6:ps_warmup	40	static
-position_sensor.c:23:6:ps_sample	24	static
+position_sensor.c:13:6:ps_warmup	40	static
+position_sensor.c:24:6:ps_sample	40	static

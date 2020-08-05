@@ -29,7 +29,7 @@ extern "C" {
  void enter_menu_state(void);
  void enter_setup_state(void);
  void calibrate(void);
- void enter_torque_mode(void);
+ void enter_motor_mode(void);
 
 #ifdef __cplusplus
 }

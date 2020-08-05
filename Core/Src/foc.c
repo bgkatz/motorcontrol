@@ -11,6 +11,7 @@
 #include "position_sensor.h"
 #include "math_ops.h"
 #include "hw_config.h"
+#include "user_config.h"
 
 void set_dtc(ControllerStruct *controller){
 	/* Output duty cycle from controller to the pwm timer */
@@ -32,8 +33,8 @@ void abc( float theta, float d, float q, float *a, float *b, float *c){
     Phase current amplitude = lengh of dq vector
     i.e. iq = 1, id = 0, peak phase current of 1 */
 
-    float cf = cos(theta);
-    float sf = sin(theta);
+    float cf = cosf(theta);
+    float sf = sinf(theta);
 
     *a = cf*d - sf*q;
     *b = (SQRT3_2*sf-.5f*cf)*d - (-SQRT3_2*cf-.5f*sf)*q;
@@ -46,49 +47,45 @@ void dq0(float theta, float a, float b, float c, float *d, float *q){
     Phase current amplitude = lengh of dq vector
     i.e. iq = 1, id = 0, peak phase current of 1*/
 
-    float cf = cos(theta);
-    float sf = sin(theta);
+    float cf = cosf(theta);
+    float sf = sinf(theta);
 
     *d = 0.6666667f*(cf*a + (SQRT3_2*sf-.5f*cf)*b + (-SQRT3_2*sf-.5f*cf)*cf);   ///Faster DQ0 Transform
     *q = 0.6666667f*(-sf*a - (-SQRT3_2*cf-.5f*sf)*b - (SQRT3_2*cf-.5f*sf)*cf);
 
     }
 
-void svm(float v_bus, float u, float v, float w, int i_sector, float *dtc_u, float *dtc_v, float *dtc_w){
+void svm(float v_bus, float u, float v, float w, float *dtc_u, float *dtc_v, float *dtc_w){
     /* Space Vector Modulation
      u,v,w amplitude = v_bus for full modulation depth */
 
     float v_offset = (fminf3(u, v, w) + fmaxf3(u, v, w))*0.5f;
 
-    // Dead-time compensation
-    float u_comp = DTC_COMP*(-(i_sector==4) + (i_sector==3));
-    float v_comp = DTC_COMP*(-(i_sector==2) + (i_sector==5));
-    float w_comp = DTC_COMP*((i_sector==6) - (i_sector==1));
 
-    *dtc_u = fminf(fmaxf((.5f*(u -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f + u_comp), DTC_MIN), DTC_MAX);
-    *dtc_v = fminf(fmaxf((.5f*(v -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f + v_comp), DTC_MIN), DTC_MAX);
-    *dtc_w = fminf(fmaxf((.5f*(w -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f + w_comp), DTC_MIN), DTC_MAX);
+    *dtc_u = fminf(fmaxf((.5f*(u -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f ), DTC_MIN), DTC_MAX);
+    *dtc_v = fminf(fmaxf((.5f*(v -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f ), DTC_MIN), DTC_MAX);
+    *dtc_w = fminf(fmaxf((.5f*(w -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f ), DTC_MIN), DTC_MAX);
 
     }
 
 void zero_current(ControllerStruct *controller){
 	/* Measure zero-current ADC offset */
 
-    int adc1_offset = 0;
-    int adc2_offset = 0;
+    int adc_b_offset = 0;
+    int adc_c_offset = 0;
     int n = 1000;
     controller->dtc_u = 1.0f;
     controller->dtc_v = 1.0f;
     controller->dtc_w = 1.0f;
     set_dtc(controller);
-    for (int i = 0; i<n; i++){                                                  // Average n samples of the ADC
-    	HAL_ADC_Start(&controller->adc_1);
+    for (int i = 0; i<n; i++){               // Average n samples
+    	HAL_ADC_Start(&ADC_CH_MAIN);
     	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-    	adc1_offset +=  HAL_ADC_GetValue(&controller->adc_1);
-    	adc2_offset += HAL_ADC_GetValue(&controller->adc_2);
+    	adc_b_offset +=  HAL_ADC_GetValue(&ADC_CH_IB);
+    	adc_c_offset += HAL_ADC_GetValue(&ADC_CH_IC);
      }
-    controller->adc1_offset = adc1_offset/n;
-    controller->adc2_offset = adc2_offset/n;
+    controller->adc_b_offset = adc_b_offset/n;
+    controller->adc_c_offset = adc_c_offset/n;
 
     }
 
@@ -107,10 +104,10 @@ void init_controller_params(ControllerStruct *controller){
     }
 
 void reset_foc(ControllerStruct *controller){
-	/*
-	controller->tim->Instance->CCR3 = ((controller->tim->Instance->ARR)>>1)*(0.5f);
-	controller->tim->Instance->CCR1 = ((controller->tim->Instance->ARR)>>1)*(0.5f);
-	controller->tim->Instance->CCR2 = ((controller->tim->Instance->ARR)>>1)*(0.5f);
+
+	TIM_PWM.Instance->CCR3 = ((TIM_PWM.Instance->ARR)>>1)*(0.5f);
+	TIM_PWM.Instance->CCR1 = ((TIM_PWM.Instance->ARR)>>1)*(0.5f);
+	TIM_PWM.Instance->CCR2 = ((TIM_PWM.Instance->ARR)>>1)*(0.5f);
     controller->i_d_ref = 0;
     controller->i_q_ref = 0;
     controller->i_d = 0;
@@ -121,7 +118,7 @@ void reset_foc(ControllerStruct *controller){
     controller->v_q = 0;
     controller->v_d = 0;
     controller->otw_flag = 0;
-*/
+
     }
 
 void reset_observer(ObserverStruct *observer){
@@ -196,35 +193,23 @@ void field_weaken(ControllerStruct *controller)
        //float i_cmd_mag_sq = controller->i_d_ref*controller->i_d_ref + controller->i_q_ref*controller->i_q_ref;
 */
 }
-void commutate(ControllerStruct *controller, ObserverStruct *observer, GPIOStruct *gpio, float theta)
+void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderStruct *encoder)
 {
-	/*
+	/* Do Field Oriented Controll and stuff */
+
+
        /// Commutation Loop ///
        controller->loop_count ++;
-       if(PHASE_ORDER){                                                                          // Check current sensor ordering
-           controller->i_b = I_SCALE*(float)(controller->adc2_raw - controller->adc2_offset);    // Calculate phase currents from ADC readings
-           controller->i_c = I_SCALE*(float)(controller->adc1_raw - controller->adc1_offset);
-           }
-        else{
-            controller->i_b = I_SCALE*(float)(controller->adc1_raw - controller->adc1_offset);
-           controller->i_c = I_SCALE*(float)(controller->adc2_raw - controller->adc2_offset);
-           }
+       controller->i_b = I_SCALE*(float)(controller->adc_b_raw - controller->adc_b_offset);    // Calculate phase currents from ADC readings
+       controller->i_c = I_SCALE*(float)(controller->adc_c_raw - controller->adc_c_offset);
        controller->i_a = -controller->i_b - controller->i_c;
-       if((abs(controller->i_b) > 41.0f)|(abs(controller->i_c) > 41.0f)|(abs(controller->i_a) > 41.0f)){controller->oc_flag = 1;}
 
-       float s = FastSin(theta);
-       float c = FastCos(theta);
+       if((fabsf(controller->i_b) > 41.0f)|(fabsf(controller->i_c) > 41.0f)|(fabsf(controller->i_a) > 41.0f)){controller->oc_flag = 1;}
+
        dq0(controller->theta_elec, controller->i_a, controller->i_b, controller->i_c, &controller->i_d, &controller->i_q);    //dq0 transform on currents
-       //controller->i_d = 0.6666667f*(c*controller->i_a + (0.86602540378f*s-.5f*c)*controller->i_b + (-0.86602540378f*s-.5f*c)*controller->i_c);   ///Faster DQ0 Transform
-       //controller->i_q = 0.6666667f*(-s*controller->i_a - (-0.86602540378f*c-.5f*s)*controller->i_b - (0.86602540378f*c-.5f*s)*controller->i_c);
 
-        controller->i_q_filt = 0.95f*controller->i_q_filt + 0.05f*controller->i_q;
-        controller->i_d_filt = 0.95f*controller->i_d_filt + 0.05f*controller->i_d;
-
-
-        // Filter the current references to the desired closed-loop bandwidth
-        //controller->i_d_ref_filt = (1.0f-controller->alpha)*controller->i_d_ref_filt + controller->alpha*controller->i_d_ref;
-        //controller->i_q_ref_filt = (1.0f-controller->alpha)*controller->i_q_ref_filt + controller->alpha*controller->i_q_ref;
+       controller->i_q_filt = 0.95f*controller->i_q_filt + 0.05f*controller->i_q;
+       controller->i_d_filt = 0.95f*controller->i_d_filt + 0.05f*controller->i_d;
 
         controller->i_max = I_MAX*(!controller->otw_flag) + I_MAX_CONT*controller->otw_flag;
 
@@ -253,8 +238,8 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, GPIOStruc
        controller->d_int += controller->k_d*controller->ki_d*i_d_error;
        controller->q_int += controller->k_q*controller->ki_q*i_q_error;
 
-       controller->d_int = fmaxf(fminf(controller->d_int, OVERMODULATION*controller->v_bus), - OVERMODULATION*controller->v_bus);
-       controller->q_int = fmaxf(fminf(controller->q_int, OVERMODULATION*controller->v_bus), - OVERMODULATION*controller->v_bus);
+       controller->d_int = fmaxf(fminf(controller->d_int, OVERMODULATION*controller->v_bus), -OVERMODULATION*controller->v_bus);
+       controller->q_int = fmaxf(fminf(controller->q_int, OVERMODULATION*controller->v_bus), -OVERMODULATION*controller->v_bus);
 
        //limit_norm(&controller->d_int, &controller->q_int, OVERMODULATION*controller->v_bus);
        controller->v_d = controller->k_d*i_d_error + controller->d_int;// + v_d_ff;
@@ -274,25 +259,10 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, GPIOStruc
        //controller->v_d = dtc_d*controller->v_bus;
        //controller->v_q = dtc_q*controller->v_bus;
        abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, scale*controller->v_d, scale*controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-       controller->current_sector = ((controller->i_a>0)<<2)|((controller->i_b>0)<<1)|(controller->i_c>0);
-       svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, controller->current_sector, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
+       svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
 
 
-
-       if(PHASE_ORDER){                                                         // Check which phase order to use,
-            controller->tim->Instance->CCR3 = ((controller->tim->Instance->ARR))*(1.0f-controller->dtc_u);                        // Write duty cycles
-            controller->tim->Instance->CCR2 = ((controller->tim->Instance->ARR))*(1.0f-controller->dtc_v);
-            controller->tim->Instance->CCR1 = ((controller->tim->Instance->ARR))*(1.0f-controller->dtc_w);
-        }
-        else{
-            controller->tim->Instance->CCR3 = ((controller->tim->Instance->ARR))*(1.0f-controller->dtc_u);
-            controller->tim->Instance->CCR1 = ((controller->tim->Instance->ARR))*(1.0f-controller->dtc_v);
-            controller->tim->Instance->CCR2 =  ((controller->tim->Instance->ARR))*(1.0f-controller->dtc_w);
-        }
-
-       controller->theta_elec = theta;
-*/
     }
 
 

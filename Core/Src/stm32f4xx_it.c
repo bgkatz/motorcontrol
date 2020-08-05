@@ -230,31 +230,25 @@ void TIM1_UP_TIM10_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
 
-	// FOC: update sensors //
-	//ADC1->CR2  |= 0x40000000;
-	//controller.adc2_raw = ADC2->DR;                                         // Read ADC Data Registers
-	//controller.adc1_raw = ADC1->DR;
-	//controller.adc3_raw = ADC3->DR;
-
 	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
-	HAL_ADC_Start(&controller.adc_1);
+	HAL_ADC_Start(&ADC_CH_MAIN);
 	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	controller.adc1_raw = HAL_ADC_GetValue(&controller.adc_1);
-	controller.adc2_raw = HAL_ADC_GetValue(&controller.adc_2);
-	controller.adc3_raw = HAL_ADC_GetValue(&controller.adc_3);
+	controller.adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IB);
+	controller.adc_c_raw = HAL_ADC_GetValue(&ADC_CH_IC);
+	controller.adc_vbus_raw = HAL_ADC_GetValue(&ADC_CH_VBUS);
 	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
 	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
 	ps_sample(&comm_encoder, .000025f);
 	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
-	controller.dtc_u = .1f;
-	controller.dtc_v = .2f;
-	controller.dtc_w = .3f;
-
-	set_dtc(&controller);
-
 	run_fsm(&state);
+
+	// torque_controll(&controller);
+	commutate(&controller, &observer, &comm_encoder);
+	//set_dtc(&controller);
+
+
 	//state.state_change = 0; //delete me later
 
 	controller.loop_count++;
