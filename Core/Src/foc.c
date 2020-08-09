@@ -171,13 +171,12 @@ void update_observer(ControllerStruct *controller, ObserverStruct *observer)
 
 float linearize_dtc(ControllerStruct *controller, float dtc)
 {
-	/*
-    float duty = fmaxf(fminf(abs(dtc), .999f), 0.0f);;
+
+    float duty = fmaxf(fminf(fabs(dtc), .999f), 0.0f);;
     int index = (int) (duty*127.0f);
     float val1 = controller->inverter_tab[index];
     float val2 = controller->inverter_tab[index+1];
     return val1 + (val2 - val1)*(duty*128.0f - (float)index);
-    */
 }
 
 void field_weaken(ControllerStruct *controller)
@@ -197,6 +196,8 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
 {
 	/* Do Field Oriented Controll and stuff */
 
+		controller->v_bus = 1;
+		controller->theta_elec = 0;
 
        /// Commutation Loop ///
        controller->loop_count ++;
@@ -249,8 +250,9 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        controller->v_ref = sqrt(controller->v_d*controller->v_d + controller->v_q*controller->v_q);
 
        limit_norm(&controller->v_d, &controller->v_q, OVERMODULATION*controller->v_bus);       // Normalize voltage vector to lie within curcle of radius v_bus
-       float dtc = controller->v_ref/controller->v_bus;
-       float scale = linearize_dtc(controller, dtc);
+       //float dtc = controller->v_ref/controller->v_bus;
+       float scale = 0;//linearize_dtc(controller, dtc);
+
        //controller->v_d = scale*controller->v_d;
        //controller->v_q = scale*controller->v_q;
        //float dtc_q = controller->v_q/controller->v_bus;
@@ -258,10 +260,18 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        //linearize_dtc(&dtc_q);
        //controller->v_d = dtc_d*controller->v_bus;
        //controller->v_q = dtc_q*controller->v_bus;
+
+       controller->v_d = 0;
+       controller->v_q = .25f;
+       controller->theta_elec = 0;
+
        abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, scale*controller->v_d, scale*controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
-
+       controller->dtc_u = .1f;
+       controller->dtc_v = .2f;
+       controller->dtc_w = .3f;
+       set_dtc(controller);
 
     }
 

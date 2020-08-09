@@ -33,6 +33,8 @@
 			 enter_motor_mode();
 		 	 fsmstate->state_change = 0;
 		 	 }
+
+		 commutate(&controller, &observer, &comm_encoder);
 		 break;
 	 case SETUP_MODE:
 		 if(fsmstate->state_change){

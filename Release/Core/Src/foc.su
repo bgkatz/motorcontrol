@@ -8,7 +8,7 @@ foc.c:106:6:reset_foc	0	static
 foc.c:124:6:reset_observer	0	static
 foc.c:132:6:limit_current_ref	0	static
 foc.c:140:6:update_observer	0	static
-foc.c:172:7:linearize_dtc	0	static
-foc.c:183:6:field_weaken	0	static
-foc.c:196:6:commutate	48	static
-foc.c:269:6:torque_control	0	static
+foc.c:172:7:linearize_dtc	8	static
+foc.c:182:6:field_weaken	0	static
+foc.c:195:6:commutate	56	static
+foc.c:279:6:torque_control	0	static

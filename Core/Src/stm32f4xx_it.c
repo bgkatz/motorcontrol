@@ -242,10 +242,11 @@ void TIM1_UP_TIM10_IRQHandler(void)
 	ps_sample(&comm_encoder, .000025f);
 	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
+	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
 	run_fsm(&state);
-
+	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 	// torque_controll(&controller);
-	commutate(&controller, &observer, &comm_encoder);
+	//commutate(&controller, &observer, &comm_encoder);
 	//set_dtc(&controller);
 
 

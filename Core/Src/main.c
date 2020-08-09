@@ -225,7 +225,7 @@ int main(void)
   while (1)
   {
 
-	  HAL_Delay(100);
+	  //HAL_Delay(100);
 	 //printf("%d  %d  %d\r\n", controller.adc1_raw, controller.adc2_raw, controller.adc3_raw);
 	  //drv_print_faults(drv);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
