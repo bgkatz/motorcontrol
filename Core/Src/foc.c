@@ -262,7 +262,7 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        //controller->v_q = dtc_q*controller->v_bus;
 
        controller->v_d = 0;
-       controller->v_q = .25f;
+       controller->v_q = .1f;
        controller->theta_elec = 0;
 
        abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, scale*controller->v_d, scale*controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
@@ -277,10 +277,18 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
 
 
 void torque_control(ControllerStruct *controller){
-	/*
+/*
     float torque_ref = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
     //float torque_ref = -.1*(controller->p_des - controller->theta_mech);
     controller->i_q_ref = torque_ref/KT_OUT;
     controller->i_d_ref = 0.0f;
-    */
+  */
     }
+
+void zero_commands(ControllerStruct * controller){
+	controller->t_ff = 0;
+	controller->kp = 0;
+	controller->kd = 0;
+	controller->p_des = 0;
+	controller->v_des = 0;
+}

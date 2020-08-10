@@ -31,7 +31,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	//memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float)); // this is much slower for some reason
 
 	/* SPI read/write */
-	encoder->spi_tx_word = 0x0000;
+	encoder->spi_tx_word = ENC_READ_WORD;
 	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
 	HAL_SPI_TransmitReceive(&ENC_SPI, (uint8_t*)encoder->spi_tx_buff, (uint8_t *)encoder->spi_rx_buff, 1, 100);
 	while( ENC_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
@@ -55,6 +55,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 	/* Multi-turn position */
 	encoder->angle_multiturn[0] = encoder->angle_singleturn + 2.0f*PI_F*(float)encoder->turns;
+	encoder->output_angle_multiturn = encoder->angle_multiturn[0]*GR;
 
 	/** Velocity */
 	/*
@@ -80,4 +81,15 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	*/
 
 	encoder->velocity = (encoder->angle_multiturn[0] - encoder->angle_multiturn[N_POS_SAMPLES-1])/(dt*(float)N_POS_SAMPLES);
+	encoder->elec_velocity = encoder->ppairs*encoder->velocity;
 }
+
+void ps_print(EncoderStruct * encoder, int dt_ms){
+	printf("Raw: %d", encoder->raw);
+	printf("   Linearized Count: %d", encoder->count);
+	printf("   Single Turn: %f", encoder->angle_singleturn);
+	printf("   Multiturn: %f", encoder->angle_multiturn[0]);
+	printf("   Electrical: %f\r\n", encoder->elec_angle);
+	//HAL_Delay(dt_ms);
+}
+

@@ -24,7 +24,7 @@ void limit_current_ref (ControllerStruct *controller);
 void update_observer(ControllerStruct *controller, ObserverStruct *observer);
 void field_weaken(ControllerStruct *controller);
 float linearize_dtc(ControllerStruct *controller, float dtc);
-
+void zero_commands(ControllerStruct * controller);
 
 
 #endif /* INC_FOC_H_ */

@@ -28,7 +28,9 @@ typedef struct{
 
 typedef struct{
 	uint8_t state;
+	uint8_t new_state;
 	uint8_t state_change;
+	uint8_t ready;
 }FSMStruct;
 
 typedef struct{
@@ -39,6 +41,7 @@ typedef struct{
     float theta_mech, theta_elec;                           // Rotor mechanical and electrical angle
     float dtheta_mech, dtheta_elec, dtheta_elec_filt;       // Rotor mechanical and electrical angular velocit
     float i_d, i_q, i_q_filt, i_d_filt;                     // D/Q currents
+    float i_mag;											// Current magnitude
     float v_d, v_q;                                         // D/Q voltages
     float dtc_u, dtc_v, dtc_w;                              // Terminal duty cycles
     float v_u, v_v, v_w;                                    // Terminal voltages
@@ -79,7 +82,8 @@ typedef struct{
 		uint8_t spi_rx_buff[2];
 		uint16_t spi_rx_word;
 	};
-	float angle_singleturn, angle_multiturn[N_POS_SAMPLES], old_angle_multiturn, elec_angle, velocity, vel2, ppairs;
+	float angle_singleturn, angle_multiturn[N_POS_SAMPLES], elec_angle, velocity, elec_velocity, ppairs;
+	float output_angle_multiturn;
 	int raw, count, old_count, turns;
 	int m_zero, e_zero;
 	int offset_lut[128];

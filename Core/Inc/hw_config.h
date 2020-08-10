@@ -25,6 +25,7 @@
 #define ENC_SPI			hspi3				// Encoder SPI handle
 #define ENC_CS			GPIOA, GPIO_PIN_15	// Encoder SPI CS pin
 #define ENC_CPR			65536				// Encoder counts per revolution
+#define ENC_READ_WORD	0x00				// Encoder read command
 
 /* Misc. GPIO */
 #define LED         	GPIOC, GPIO_PIN_5	// LED Pin
@@ -37,5 +38,5 @@
 #define DTC_COMP 			.000f          	// deadtime compensation (100 ns / 25 us)
 #define OVERMODULATION	 	1.15f			// Max overmodulation
 #define DT					.000025f		// Loop period
-
+#define GR					1.0f			// Gear ratio (move this later)
 #endif

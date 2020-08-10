@@ -14,5 +14,6 @@
 
 void ps_warmup(EncoderStruct * encoder, int n);
 void ps_sample(EncoderStruct * encoder, float dt);
+void ps_print(EncoderStruct * encoder, int dt_ms);
 
 #endif /* INC_POSITION_SENSOR_H_ */

@@ -12,11 +12,17 @@
 #include "user_config.h"
 #include "structs.h"
 #include "foc.h"
+#include "math_ops.h"
+#include "position_sensor.h"
 
  void run_fsm(FSMStruct * fsmstate){
-	 /* run_smf is run every commutation interrupt cycle */
-	 if(fsmstate->state_change){
-		 printf("FSM State %d\r\n", fsmstate->state);
+	 /* run_fsm is run every commutation interrupt cycle */
+
+	 if(fsmstate->new_state != fsmstate->state){
+		 fsm_exit_state(fsmstate);		// safely exit the old state
+		 if(fsmstate->ready){			// if the previous state is ready, enter the new state
+			 fsm_enter_state(fsmstate);
+		 }
 	 }
 
 	 switch(fsmstate->state){
@@ -24,33 +30,83 @@
 		 if(fsmstate->state_change){
 			 enter_menu_state();
 		 	 fsmstate->state_change = 0;
-		 	 }
+		 }
 		 break;
+
 	 case CALIBRATION_MODE:
 		 break;
+
 	 case MOTOR_MODE:
 		 if(fsmstate->state_change){
 			 enter_motor_mode();
 		 	 fsmstate->state_change = 0;
-		 	 }
+		 }
 
+		 // get latest commands
+		 // torque_control
 		 commutate(&controller, &observer, &comm_encoder);
+
 		 break;
+
 	 case SETUP_MODE:
 		 if(fsmstate->state_change){
 		 	enter_setup_state();
 		 	fsmstate->state_change = 0;
-		 	 }
+		 }
 		 break;
+
 	 case ENCODER_MODE:
+		 if(fsmstate->state_change){
+			 fsmstate->state_change = 0;
+		 }
+		 ps_print(&comm_encoder, 100);
 		 break;
+
 	 case INIT_TEMP_MODE:
 		 break;
 	 }
 
  }
 
+ void fsm_enter_state(FSMStruct * fsmstate){
+	 /* Called when entering a new state
+	  * Do necessary setup   */
 
+		switch(fsmstate->state){
+		case MENU_MODE:
+			break;
+		case SETUP_MODE:
+			break;
+		case ENCODER_MODE:
+			break;
+		case MOTOR_MODE:
+			break;
+		}
+ }
+
+ void fsm_exit_state(FSMStruct * fsmstate){
+	 /* Called when exiting the current state
+	  * Do necessary cleanup  */
+
+		switch(fsmstate->state){
+		case MENU_MODE:
+			fsmstate->ready = 1;
+			break;
+		case SETUP_MODE:
+			fsmstate->ready = 1;
+			break;
+		case ENCODER_MODE:
+			fsmstate->ready = 1;
+			break;
+		case MOTOR_MODE:
+			/* Don't stop commutating if there are high currents or FW happening */
+			if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
+				fsmstate->ready = 1;
+			}
+			zero_commands(&controller);		// Set commands to zero
+			break;
+		}
+ }
 
  void update_fsm(FSMStruct * fsmstate, char fsm_input){
 	 /*update_fsm is only run when new state-change information is received
@@ -135,9 +191,6 @@
 	    printf("\n\r To change a value, type 'prefix''value''ENTER'\n\r i.e. 'b1000''ENTER'\n\r\n\r");
  }
 
- void calibrate(void){
-
- }
 
  void enter_motor_mode(void){
 

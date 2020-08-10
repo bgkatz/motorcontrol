@@ -26,9 +26,10 @@ extern "C" {
 
  void run_fsm(FSMStruct* fsmstate);
  void update_fsm(FSMStruct * fsmstate, char fsm_input);
+ void fsm_enter_state(FSMStruct * fsmstate);
+ void fsm_exit_state(FSMStruct * fsmstate);
  void enter_menu_state(void);
  void enter_setup_state(void);
- void calibrate(void);
  void enter_motor_mode(void);
 
 #ifdef __cplusplus

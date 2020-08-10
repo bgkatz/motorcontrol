@@ -236,6 +236,8 @@ void TIM1_UP_TIM10_IRQHandler(void)
 	controller.adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IB);
 	controller.adc_c_raw = HAL_ADC_GetValue(&ADC_CH_IC);
 	controller.adc_vbus_raw = HAL_ADC_GetValue(&ADC_CH_VBUS);
+
+	controller.v_bus = controller.adc_vbus_raw*V_SCALE;
 	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
 	HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );

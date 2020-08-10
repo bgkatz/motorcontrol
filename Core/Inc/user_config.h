@@ -18,9 +18,11 @@ extern "C" {
 #define I_MAX_CONT              __float_reg[9]                                  // Continuous max current
 #define PPAIRS					__float_reg[10]									// Number of motor pole-pairs
 #define L_D						__float_reg[11]									// D-axis inductance
-#define L_Q						__float_reg[11]									// Q-axis inductance
-#define R_PHASE					__float_reg[11]									// Single phase resistance
-#define WB						__float_reg[11]									// Flux linkage (webers)
+#define L_Q						__float_reg[12]									// Q-axis inductance
+#define R_PHASE					__float_reg[13]									// Single phase resistance
+#define WB						__float_reg[14]									// Flux linkage (webers)
+#define R_TH					__float_reg[15]									// Thermal resistance (C/W)
+#define C_TH					__float_reg[14]									// Thermal mass (C/J)
 
 
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration
