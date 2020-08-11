@@ -74,13 +74,14 @@ void zero_current(ControllerStruct *controller){
     int adc_b_offset = 0;
     int adc_c_offset = 0;
     int n = 1000;
-    controller->dtc_u = 1.0f;
-    controller->dtc_v = 1.0f;
-    controller->dtc_w = 1.0f;
+    controller->dtc_u = 0.f;
+    controller->dtc_v = 0.f;
+    controller->dtc_w = 0.f;
     set_dtc(controller);
+
     for (int i = 0; i<n; i++){               // Average n samples
     	HAL_ADC_Start(&ADC_CH_MAIN);
-    	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+    	HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
     	adc_b_offset +=  HAL_ADC_GetValue(&ADC_CH_IB);
     	adc_c_offset += HAL_ADC_GetValue(&ADC_CH_IC);
      }
@@ -105,9 +106,9 @@ void init_controller_params(ControllerStruct *controller){
 
 void reset_foc(ControllerStruct *controller){
 
-	TIM_PWM.Instance->CCR3 = ((TIM_PWM.Instance->ARR)>>1)*(0.5f);
-	TIM_PWM.Instance->CCR1 = ((TIM_PWM.Instance->ARR)>>1)*(0.5f);
-	TIM_PWM.Instance->CCR2 = ((TIM_PWM.Instance->ARR)>>1)*(0.5f);
+	TIM_PWM.Instance->CCR3 = ((TIM_PWM.Instance->ARR))*(0.5f);
+	TIM_PWM.Instance->CCR1 = ((TIM_PWM.Instance->ARR))*(0.5f);
+	TIM_PWM.Instance->CCR2 = ((TIM_PWM.Instance->ARR))*(0.5f);
     controller->i_d_ref = 0;
     controller->i_q_ref = 0;
     controller->i_d = 0;
@@ -196,15 +197,15 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
 {
 	/* Do Field Oriented Controll and stuff */
 
-		controller->v_bus = 1;
-		controller->theta_elec = 0;
+		controller->theta_elec = encoder->elec_angle;
+
 
        /// Commutation Loop ///
        controller->loop_count ++;
        controller->i_b = I_SCALE*(float)(controller->adc_b_raw - controller->adc_b_offset);    // Calculate phase currents from ADC readings
        controller->i_c = I_SCALE*(float)(controller->adc_c_raw - controller->adc_c_offset);
        controller->i_a = -controller->i_b - controller->i_c;
-
+/*
        if((fabsf(controller->i_b) > 41.0f)|(fabsf(controller->i_c) > 41.0f)|(fabsf(controller->i_a) > 41.0f)){controller->oc_flag = 1;}
 
        dq0(controller->theta_elec, controller->i_a, controller->i_b, controller->i_c, &controller->i_d, &controller->i_q);    //dq0 transform on currents
@@ -251,7 +252,7 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
 
        limit_norm(&controller->v_d, &controller->v_q, OVERMODULATION*controller->v_bus);       // Normalize voltage vector to lie within curcle of radius v_bus
        //float dtc = controller->v_ref/controller->v_bus;
-       float scale = 0;//linearize_dtc(controller, dtc);
+       float scale = 1;//linearize_dtc(controller, dtc);
 
        //controller->v_d = scale*controller->v_d;
        //controller->v_q = scale*controller->v_q;
@@ -260,17 +261,17 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        //linearize_dtc(&dtc_q);
        //controller->v_d = dtc_d*controller->v_bus;
        //controller->v_q = dtc_q*controller->v_bus;
+*/
+       controller->v_d = 0.f;
+       controller->v_q = 1.f;
 
-       controller->v_d = 0;
-       controller->v_q = .1f;
-       controller->theta_elec = 0;
-
-       abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, scale*controller->v_d, scale*controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
+       abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
-       controller->dtc_u = .1f;
-       controller->dtc_v = .2f;
-       controller->dtc_w = .3f;
+       //controller->dtc_u = .1f;
+       //controller->dtc_v = .2f;
+       //controller->dtc_w = .3f;
+
        set_dtc(controller);
 
     }

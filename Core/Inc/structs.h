@@ -28,7 +28,7 @@ typedef struct{
 
 typedef struct{
 	uint8_t state;
-	uint8_t new_state;
+	uint8_t next_state;
 	uint8_t state_change;
 	uint8_t ready;
 }FSMStruct;

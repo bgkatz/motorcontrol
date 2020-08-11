@@ -33,14 +33,13 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/adc.h ../Core/Inc/main.h ../Core/Inc/can.h ../Core/Inc/spi.h \
  ../Core/Inc/tim.h ../Core/Inc/usart.h ../Core/Inc/gpio.h \
- ../Core/Inc/foc.h ../Core/Inc/structs.h ../Core/Inc/spi.h \
- ../Core/Inc/gpio.h ../Core/Inc/adc.h ../Core/Inc/tim.h \
- ../Core/Inc/hw_config.h ../Core/Inc/structs.h \
- ../Core/Inc/stm32f4xx_flash.h ../Core/Inc/flash_writer.h \
- ../Core/Inc/stm32f4xx_flash.h ../Core/Inc/position_sensor.h \
+ ../Core/Inc/structs.h ../Core/Inc/spi.h ../Core/Inc/gpio.h \
+ ../Core/Inc/adc.h ../Core/Inc/tim.h ../Core/Inc/stm32f4xx_flash.h \
+ ../Core/Inc/flash_writer.h ../Core/Inc/stm32f4xx_flash.h \
+ ../Core/Inc/position_sensor.h ../Core/Inc/structs.h \
  ../Core/Inc/preference_writer.h ../Core/Inc/flash_writer.h \
- ../Core/Inc/user_config.h ../Core/Inc/fsm.h ../Core/Inc/drv8323.h \
- ../Core/Inc/math_ops.h
+ ../Core/Inc/hw_config.h ../Core/Inc/user_config.h ../Core/Inc/fsm.h \
+ ../Core/Inc/drv8323.h ../Core/Inc/foc.h ../Core/Inc/math_ops.h
 
 ../Core/Inc/main.h:
 
@@ -122,8 +121,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Core/Inc/gpio.h:
 
-../Core/Inc/foc.h:
-
 ../Core/Inc/structs.h:
 
 ../Core/Inc/spi.h:
@@ -134,10 +131,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Core/Inc/tim.h:
 
-../Core/Inc/hw_config.h:
-
-../Core/Inc/structs.h:
-
 ../Core/Inc/stm32f4xx_flash.h:
 
 ../Core/Inc/flash_writer.h:
@@ -146,14 +139,20 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 ../Core/Inc/position_sensor.h:
 
+../Core/Inc/structs.h:
+
 ../Core/Inc/preference_writer.h:
 
 ../Core/Inc/flash_writer.h:
+
+../Core/Inc/hw_config.h:
 
 ../Core/Inc/user_config.h:
 
 ../Core/Inc/fsm.h:
 
 ../Core/Inc/drv8323.h:
+
+../Core/Inc/foc.h:
 
 ../Core/Inc/math_ops.h:

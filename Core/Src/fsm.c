@@ -10,37 +10,34 @@
 #include <stdio.h>
 //#include "PreferenceWriter.h"
 #include "user_config.h"
+#include "hw_config.h"
 #include "structs.h"
 #include "foc.h"
 #include "math_ops.h"
 #include "position_sensor.h"
+#include "drv8323.h"
 
  void run_fsm(FSMStruct * fsmstate){
 	 /* run_fsm is run every commutation interrupt cycle */
 
-	 if(fsmstate->new_state != fsmstate->state){
+	 if(fsmstate->next_state != fsmstate->state){
 		 fsm_exit_state(fsmstate);		// safely exit the old state
 		 if(fsmstate->ready){			// if the previous state is ready, enter the new state
+			 fsmstate->state = fsmstate->next_state;
 			 fsm_enter_state(fsmstate);
+
 		 }
 	 }
 
 	 switch(fsmstate->state){
 	 case MENU_MODE:
-		 if(fsmstate->state_change){
-			 enter_menu_state();
-		 	 fsmstate->state_change = 0;
-		 }
 		 break;
 
 	 case CALIBRATION_MODE:
+
 		 break;
 
 	 case MOTOR_MODE:
-		 if(fsmstate->state_change){
-			 enter_motor_mode();
-		 	 fsmstate->state_change = 0;
-		 }
 
 		 // get latest commands
 		 // torque_control
@@ -49,16 +46,9 @@
 		 break;
 
 	 case SETUP_MODE:
-		 if(fsmstate->state_change){
-		 	enter_setup_state();
-		 	fsmstate->state_change = 0;
-		 }
 		 break;
 
 	 case ENCODER_MODE:
-		 if(fsmstate->state_change){
-			 fsmstate->state_change = 0;
-		 }
 		 ps_print(&comm_encoder, 100);
 		 break;
 
@@ -74,12 +64,21 @@
 
 		switch(fsmstate->state){
 		case MENU_MODE:
+			printf("Entering Main Menu\r\n");
+			enter_menu_state();
 			break;
 		case SETUP_MODE:
+			printf("Entering Setup\r\n");
+			enter_setup_state();
 			break;
 		case ENCODER_MODE:
+			printf("Entering Encoder Mode\r\n");
 			break;
 		case MOTOR_MODE:
+			printf("Entering Motor Mode\r\n");
+			HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
+			reset_foc(&controller);
+			drv_enable_gd(drv);
 			break;
 		}
  }
@@ -90,18 +89,25 @@
 
 		switch(fsmstate->state){
 		case MENU_MODE:
+			printf("Leaving Main Menu\r\n");
 			fsmstate->ready = 1;
 			break;
 		case SETUP_MODE:
+			printf("Leaving Setup Menu\r\n");
 			fsmstate->ready = 1;
 			break;
 		case ENCODER_MODE:
+			printf("Leaving Encoder Mode\r\n");
 			fsmstate->ready = 1;
 			break;
 		case MOTOR_MODE:
 			/* Don't stop commutating if there are high currents or FW happening */
 			if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
 				fsmstate->ready = 1;
+				drv_disable_gd(drv);
+				reset_foc(&controller);
+				printf("Leaving Motor Mode\r\n");
+				HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
 			}
 			zero_commands(&controller);		// Set commands to zero
 			break;
@@ -113,28 +119,28 @@
 	  * on serial terminal input or CAN input
 	  */
 	if(fsm_input == 27){	// escape to exit do rest mode
-		fsmstate->state = MENU_MODE;
-		fsmstate->state_change = 1;
+		fsmstate->next_state = MENU_MODE;
+		fsmstate->ready = 0;
 		return;
 	}
 	switch(fsmstate->state){
 	case MENU_MODE:
         switch (fsm_input){
             case 'c':
-            	fsmstate->state = CALIBRATION_MODE;
-            	fsmstate->state_change = 1;
+            	fsmstate->next_state = CALIBRATION_MODE;
+            	fsmstate->ready = 0;
                 break;
             case 'm':
-            	fsmstate->state = MOTOR_MODE;
-            	fsmstate->state_change = 1;
+            	fsmstate->next_state = MOTOR_MODE;
+            	fsmstate->ready = 0;
                 break;
             case 'e':
-            	fsmstate->state = ENCODER_MODE;
-            	fsmstate->state_change = 1;
+            	fsmstate->next_state = ENCODER_MODE;
+            	fsmstate->ready = 0;
                 break;
             case 's':
-            	fsmstate->state = SETUP_MODE;
-            	fsmstate->state_change = 1;
+            	fsmstate->next_state = SETUP_MODE;
+            	fsmstate->ready = 0;
                 break;
             case 'z':
                 //spi.SetMechOffset(0);

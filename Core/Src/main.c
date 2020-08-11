@@ -32,8 +32,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "foc.h"
-#include "hw_config.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -45,9 +43,11 @@
 #include "flash_writer.h"
 #include "position_sensor.h"
 #include "preference_writer.h"
+#include "hw_config.h"
 #include "user_config.h"
 #include "fsm.h"
 #include "drv8323.h"
+#include "foc.h"
 #include "math_ops.h"
 /* USER CODE END Includes */
 
@@ -146,7 +146,6 @@ int main(void)
   MX_ADC3_Init();
   /* USER CODE BEGIN 2 */
 
-
   /* Load settings from flash */
   preference_writer_init(&prefs, 6);
   preference_writer_load(prefs);
@@ -195,22 +194,33 @@ int main(void)
 
   HAL_GPIO_WritePin(DRV_CS, GPIO_PIN_SET ); 	// CS high
   HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
-  drv_calibrate(drv);
-  drv_write_DCR(drv, 0x0, DIS_GDF_DIS, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1);
+  HAL_Delay(1);
+  //drv_calibrate(drv);
+  HAL_Delay(1);
+  drv_write_DCR(drv, 0x0, DIS_GDF_EN, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1);
+  HAL_Delay(1);
   drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x1, 0x1, 0x1, SEN_LVL_1_0);
+  HAL_Delay(1);
   zero_current(&controller);
-  printf("ADC B OFFSET: %d     ADC C OFFSET: %d\r\n", controller.adc_b_offset, controller.adc_c_offset);
   HAL_Delay(1);
   drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x1, 0x0, 0x0, 0x0, SEN_LVL_1_0);
-  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_NONE, OCP_DEG_8US, VDS_LVL_1_88);
+  HAL_Delay(1);
+  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_DEG_8US, OCP_DEG_8US, VDS_LVL_1_88);
+  HAL_Delay(1);
   drv_disable_gd(drv);
-  drv_enable_gd(drv);
-
+  HAL_Delay(1);
+  //drv_enable_gd(drv);
+  printf("ADC B OFFSET: %d     ADC C OFFSET: %d\r\n", controller.adc_b_offset, controller.adc_c_offset);
 
   /* Turn on PWM */
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+
+  /* Start the FSM */
+  state.state = MENU_MODE;
+  state.next_state = MENU_MODE;
+  state.ready = 1;
 
   /* Turn on interrupts */
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
@@ -228,9 +238,9 @@ int main(void)
   {
 
 	  HAL_Delay(100);
-	  printf("%f\r\n", controller.v_bus);
-	 //printf("%d  %d  %d\r\n", controller.adc1_raw, controller.adc2_raw, controller.adc3_raw);
-	  //drv_print_faults(drv);
+	  //printf("%f\r\n", controller.v_bus);
+	  printf("%d  %d  %d\r\n", controller.adc_b_raw, controller.adc_c_raw, controller.adc_vbus_raw);
+	  drv_print_faults(drv);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
 	  //HAL_Delay(100);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );
