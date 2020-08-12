@@ -7,7 +7,7 @@
 #define TIM_CH_U		TIM_CHANNEL_1		// Terminal U timer channel
 #define TIM_CH_V		TIM_CHANNEL_2		// Terminal V timer channel
 #define TIM_CH_W		TIM_CHANNEL_3		// Terminal W timer channel
-#define INVERT_DTC		0					// PWM inverting (1) or non-inverting (0)
+#define INVERT_DTC		1					// PWM inverting (1) or non-inverting (0)
 
 /* ADC */
 #define ADC_CH_MAIN		hadc1				// ADC channel handle which drives simultaneous mode
@@ -39,4 +39,7 @@
 #define OVERMODULATION	 	1.15f			// Max overmodulation
 #define DT					.000025f		// Loop period
 #define GR					1.0f			// Gear ratio (move this later)
+
+
+
 #endif

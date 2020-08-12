@@ -84,6 +84,7 @@ void zero_current(ControllerStruct *controller){
     	HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
     	adc_b_offset +=  HAL_ADC_GetValue(&ADC_CH_IB);
     	adc_c_offset += HAL_ADC_GetValue(&ADC_CH_IC);
+    	HAL_ADC_GetValue(&ADC_CH_VBUS);
      }
     controller->adc_b_offset = adc_b_offset/n;
     controller->adc_c_offset = adc_c_offset/n;
@@ -263,14 +264,14 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        //controller->v_q = dtc_q*controller->v_bus;
 */
        controller->v_d = 0.f;
-       controller->v_q = 1.f;
+       controller->v_q = 1.5f;
 
        abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
-       //controller->dtc_u = .1f;
-       //controller->dtc_v = .2f;
-       //controller->dtc_w = .3f;
+       controller->dtc_u = .1f;
+       controller->dtc_v = .1f;
+       controller->dtc_w = .1f;
 
        set_dtc(controller);
 

@@ -209,7 +209,7 @@ int main(void)
   HAL_Delay(1);
   drv_disable_gd(drv);
   HAL_Delay(1);
-  //drv_enable_gd(drv);
+  //drv_enable_gd(drv);   */
   printf("ADC B OFFSET: %d     ADC C OFFSET: %d\r\n", controller.adc_b_offset, controller.adc_c_offset);
 
   /* Turn on PWM */
@@ -239,8 +239,8 @@ int main(void)
 
 	  HAL_Delay(100);
 	  //printf("%f\r\n", controller.v_bus);
-	  printf("%d  %d  %d\r\n", controller.adc_b_raw, controller.adc_c_raw, controller.adc_vbus_raw);
-	  drv_print_faults(drv);
+	  //printf("%f  %f  %f %f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
+	  //drv_print_faults(drv);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
 	  //HAL_Delay(100);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );

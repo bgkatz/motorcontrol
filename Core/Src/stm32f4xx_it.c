@@ -247,12 +247,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
 	run_fsm(&state);
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
-	// torque_controll(&controller);
-	//commutate(&controller, &observer, &comm_encoder);
-	//set_dtc(&controller);
 
-
-	//state.state_change = 0; //delete me later
 
 	controller.loop_count++;
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
