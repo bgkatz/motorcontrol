@@ -11,8 +11,7 @@
 #define INC_DRV8323_H_
 
 #include "spi.h"
-#include "structs.h"
-
+#include <stdint.h>
 
 /// Registers ///
 #define FSR1            0x0     /// Fault Status Register 1
@@ -160,6 +159,20 @@
 #define SEN_LVL_0_5         0x1
 #define SEN_LVL_0_75        0x2
 #define SEN_LVL_1_0         0x3
+
+
+typedef struct{
+	union{
+		uint8_t spi_tx_buff[2];
+		uint16_t spi_tx_word;
+	};
+	union{
+		uint8_t spi_rx_buff[2];
+		uint16_t spi_rx_word;
+	};
+	uint16_t fault;
+} DRVStruct;
+
 
 uint16_t drv_spi_write(DRVStruct * drv, uint16_t val);
 uint16_t drv_read_FSR1(DRVStruct drv);

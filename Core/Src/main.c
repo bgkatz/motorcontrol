@@ -237,8 +237,9 @@ int main(void)
   while (1)
   {
 
-	  HAL_Delay(100);
+	  HAL_Delay(1);
 	  //printf("%f\r\n", controller.v_bus);
+	  printf("%d\r\n", controller.adc_vbus_raw);
 	  //printf("%f  %f  %f %f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
 	  //drv_print_faults(drv);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );

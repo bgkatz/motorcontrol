@@ -269,9 +269,9 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
-       controller->dtc_u = .1f;
-       controller->dtc_v = .1f;
-       controller->dtc_w = .1f;
+       //controller->dtc_u = .1f;
+       //controller->dtc_v = .1f;
+       //controller->dtc_w = .1f;
 
        set_dtc(controller);
 

@@ -12,6 +12,7 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
 
 
 
@@ -22,15 +23,21 @@ extern "C" {
 #define ENCODER_MODE        5
 #define INIT_TEMP_MODE      6
 
-#include "structs.h"
 
- void run_fsm(FSMStruct* fsmstate);
- void update_fsm(FSMStruct * fsmstate, char fsm_input);
- void fsm_enter_state(FSMStruct * fsmstate);
- void fsm_exit_state(FSMStruct * fsmstate);
- void enter_menu_state(void);
- void enter_setup_state(void);
- void enter_motor_mode(void);
+typedef struct{
+	uint8_t state;
+	uint8_t next_state;
+	uint8_t state_change;
+	uint8_t ready;
+}FSMStruct;
+
+void run_fsm(FSMStruct* fsmstate);
+void update_fsm(FSMStruct * fsmstate, char fsm_input);
+void fsm_enter_state(FSMStruct * fsmstate);
+void fsm_exit_state(FSMStruct * fsmstate);
+void enter_menu_state(void);
+void enter_setup_state(void);
+void enter_motor_mode(void);
 
 #ifdef __cplusplus
 }

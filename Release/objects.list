@@ -1,4 +1,5 @@
 "Core/Src/adc.o"
+"Core/Src/calibration.o"
 "Core/Src/can.o"
 "Core/Src/drv8323.o"
 "Core/Src/flash_writer.o"
