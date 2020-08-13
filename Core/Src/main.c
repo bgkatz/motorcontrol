@@ -174,7 +174,6 @@ int main(void)
 
   }
   controller.invert_dtc = 1;		// 1 = invert duty cycle, 0 = don't.
-  I_BW = 100;
   PPAIRS = 7;
 
   /* commutation encoder setup */
@@ -239,7 +238,7 @@ int main(void)
 
 	  HAL_Delay(1);
 	  //printf("%f\r\n", controller.v_bus);
-	  printf("%d\r\n", controller.adc_vbus_raw);
+	  //printf("%d\r\n", controller.adc_vbus_raw);
 	  //printf("%f  %f  %f %f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
 	  //drv_print_faults(drv);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );

@@ -57,6 +57,7 @@ void preference_writer_close(PreferenceWriter *pr);
 
 extern PreferenceWriter prefs;
 
+
 #endif
 
 

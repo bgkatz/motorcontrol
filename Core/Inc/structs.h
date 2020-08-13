@@ -19,6 +19,7 @@ extern "C" {
 #include "adc.h"
 #include "tim.h"
 #include "position_sensor.h"
+#include "preference_writer.h"
 #include "fsm.h"
 #include "drv8323.h"
 #include "foc.h"
@@ -37,6 +38,7 @@ extern COMStruct com;
 extern FSMStruct state;
 extern EncoderStruct comm_encoder;
 extern DRVStruct drv;
+extern PreferenceWriter prefs;
 
 
 #endif

@@ -8,7 +8,8 @@
 #include "fsm.h"
 #include "usart.h"
 #include <stdio.h>
-//#include "PreferenceWriter.h"
+#include <string.h>
+#include <stdlib.h>
 #include "user_config.h"
 #include "hw_config.h"
 #include "structs.h"
@@ -25,7 +26,6 @@
 		 if(fsmstate->ready){			// if the previous state is ready, enter the new state
 			 fsmstate->state = fsmstate->next_state;
 			 fsm_enter_state(fsmstate);
-
 		 }
 	 }
 
@@ -80,6 +80,10 @@
 			reset_foc(&controller);
 			drv_enable_gd(drv);
 			break;
+		case CALIBRATION_MODE:
+			printf("Entering Calibration Mode\r\n");
+			break;
+
 		}
  }
 
@@ -111,7 +115,12 @@
 			}
 			zero_commands(&controller);		// Set commands to zero
 			break;
+		case CALIBRATION_MODE:
+			printf("Exiting Calibration Mode\r\n");
+			fsmstate->ready = 1;
+			break;
 		}
+
  }
 
  void update_fsm(FSMStruct * fsmstate, char fsm_input){
@@ -157,7 +166,20 @@
             }
 		break;
 	case SETUP_MODE:
+		if(fsm_input == 13){
+			process_user_input(fsmstate);
+			break;
+		}
+		if(fsmstate->bytecount == 0){fsmstate->cmd_id = fsm_input;}
+		else{
+			fsmstate->cmd_buff[fsmstate->bytecount-1] = fsm_input;
+			//fsmstate->bytecount = fsmstate->bytecount%(sizeof(fsmstate->cmd_buff)/sizeof(fsmstate->cmd_buff[0])); // reset when buffer is full
+		}
+		fsmstate->bytecount++;
+		/* If enter is typed, process user input */
+
 		break;
+
 	case ENCODER_MODE:
 		break;
 	case MOTOR_MODE:
@@ -171,7 +193,7 @@
 	    //drv.disable_gd();
 	    //reset_foc(&controller);
 	    //gpio.enable->write(0);
-	    printf("\n\r\n\r\n\r");
+	    printf("\n\r\n\r");
 	    printf(" Commands:\n\r");
 	    printf(" m - Motor Mode\n\r");
 	    printf(" c - Calibrate Encoder\n\r");
@@ -184,8 +206,8 @@
  }
 
  void enter_setup_state(void){
-	    printf("\n\r\n\r Configuration Options \n\r\n\n");
-	    printf(" %-4s %-31s %-5s %-6s %-2s\n\r\n\r", "prefix", "parameter", "min", "max", "current value");
+	    printf("\r\n Configuration Options \n\r");
+	    printf(" %-4s %-31s %-5s %-6s %-2s\r\n", "prefix", "parameter", "min", "max", "current value");
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "b", "Current Bandwidth (Hz)", "100", "2000", I_BW);
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "i", "CAN ID", "0", "127", CAN_ID);
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "m", "CAN Master ID", "0", "127", CAN_MASTER);
@@ -194,9 +216,65 @@
 	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "t", "CAN Timeout (cycles)(0 = none)", "0", "100000", CAN_TIMEOUT);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "h", "Temp Cutoff (C) (0 = none)", "0", "150", TEMP_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "c", "Continuous Current (A)", "0", "40.0", I_MAX_CONT);
-	    printf("\n\r To change a value, type 'prefix''value''ENTER'\n\r i.e. 'b1000''ENTER'\n\r\n\r");
+	    printf(" \n\r To change a value, type 'prefix''value''ENTER'\n\r i.e. 'b1000''ENTER'\r\n ");
+	    printf("VALUES NOT ACTIVE UNTIL POWER CYCLE! \n\r\n\r");
  }
 
+ void process_user_input(FSMStruct * fsmstate){
+	 /* Collects user input from serial (maybe eventually CAN) and updates settings */
+
+	 switch (fsmstate->cmd_id){
+		 case 'b':
+			 I_BW = fmaxf(fminf(atof(fsmstate->cmd_buff), 2000.0f), 100.0f);
+			 printf("I_BW set to %f\r\n", I_BW);
+			 break;
+		 case 'i':
+			 CAN_ID = atoi(fsmstate->cmd_buff);
+			 printf("CAN_ID set to %d\r\n", CAN_ID);
+			 break;
+		 case 'm':
+			 CAN_MASTER = atoi(fsmstate->cmd_buff);
+			 printf("CAN_MASTER set to %d\r\n", CAN_MASTER);
+			 break;
+		 case 'l':
+			 I_MAX = fmaxf(fminf(atof(fsmstate->cmd_buff), 40.0f), 0.0f);
+			 printf("I_MAX set to %f\r\n", I_MAX);
+			 break;
+		 case 'f':
+			 I_FW_MAX = fmaxf(fminf(atof(fsmstate->cmd_buff), 33.0f), 0.0f);
+			 printf("I_FW_MAX set to %f\r\n", I_FW_MAX);
+			 break;
+		 case 't':
+			 CAN_TIMEOUT = atoi(fsmstate->cmd_buff);
+			 printf("CAN_TIMEOUT set to %d\r\n", CAN_TIMEOUT);
+			 break;
+		 case 'h':
+			 TEMP_MAX = fmaxf(fminf(atof(fsmstate->cmd_buff), 150.0f), 0.0f);
+			 printf("TEMP_MAX set to %f\r\n", TEMP_MAX);
+			 break;
+		 case 'c':
+			 I_MAX_CONT = fmaxf(fminf(atof(fsmstate->cmd_buff), 40.0f), 0.0f);
+			 printf("I_MAX_CONT set to %f\r\n", I_MAX_CONT);
+			 break;
+		 default:
+			 printf("\n\r '%c' Not a valid command prefix\n\r\n\r", fsmstate->cmd_buff);
+			 break;
+
+		 }
+
+	 /* Write new settings to flash */
+
+	 if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+	 preference_writer_flush(&prefs);
+	 preference_writer_close(&prefs);
+	 preference_writer_load(prefs);
+
+	 enter_setup_state();
+
+	 fsmstate->bytecount = 0;
+	 fsmstate->cmd_id = 0;
+	 memset(&fsmstate->cmd_buff, 0, sizeof(fsmstate->cmd_buff));
+ }
 
  void enter_motor_mode(void){
 

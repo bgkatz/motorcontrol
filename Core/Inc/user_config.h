@@ -22,7 +22,7 @@ extern "C" {
 #define R_PHASE					__float_reg[13]									// Single phase resistance
 #define WB						__float_reg[14]									// Flux linkage (webers)
 #define R_TH					__float_reg[15]									// Thermal resistance (C/W)
-#define C_TH					__float_reg[14]									// Thermal mass (C/J)
+#define C_TH					__float_reg[16]									// Thermal mass (C/J)
 
 
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration

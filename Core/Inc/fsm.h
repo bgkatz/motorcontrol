@@ -29,6 +29,9 @@ typedef struct{
 	uint8_t next_state;
 	uint8_t state_change;
 	uint8_t ready;
+	char cmd_buff[8];
+	char bytecount;
+	char cmd_id;
 }FSMStruct;
 
 void run_fsm(FSMStruct* fsmstate);
@@ -38,6 +41,7 @@ void fsm_exit_state(FSMStruct * fsmstate);
 void enter_menu_state(void);
 void enter_setup_state(void);
 void enter_motor_mode(void);
+void process_user_input(FSMStruct * fsmstate);
 
 #ifdef __cplusplus
 }

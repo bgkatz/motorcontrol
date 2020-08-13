@@ -9,7 +9,7 @@
 #include "calibration.h"
 
 void order_phases(EncoderStruct *encoder, ControllerStruct *controller, PreferenceWriter *prefs){
-
+/*
     ///Checks phase order, to ensure that positive Q current produces
     ///torque in the positive direction wrt the position sensor.
     printf("\n\r Checking phase ordering\n\r");
@@ -63,6 +63,7 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, Preferen
     if(direction){printf("Phasing correct\n\r");}
     else if(!direction){printf("Phasing incorrect.  Swapping phases V and W\n\r");}
     PHASE_ORDER = direction;
+    */
 }
 
 void calibrate(EncoderStruct *encoder, ControllerStruct *controller, PreferenceWriter *prefs){

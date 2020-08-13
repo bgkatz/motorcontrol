@@ -33,9 +33,11 @@ Core/Src/fsm.o: ../Core/Src/fsm.c ../Core/Inc/fsm.h ../Core/Inc/usart.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/user_config.h ../Core/Inc/hw_config.h ../Core/Inc/structs.h \
  ../Core/Inc/spi.h ../Core/Inc/gpio.h ../Core/Inc/adc.h ../Core/Inc/tim.h \
- ../Core/Inc/position_sensor.h ../Core/Inc/fsm.h ../Core/Inc/drv8323.h \
- ../Core/Inc/foc.h ../Core/Inc/foc.h ../Core/Inc/math_ops.h \
- ../Core/Inc/position_sensor.h ../Core/Inc/drv8323.h
+ ../Core/Inc/position_sensor.h ../Core/Inc/preference_writer.h \
+ ../Core/Inc/flash_writer.h ../Core/Inc/stm32f4xx_flash.h \
+ ../Core/Inc/fsm.h ../Core/Inc/drv8323.h ../Core/Inc/foc.h \
+ ../Core/Inc/foc.h ../Core/Inc/math_ops.h ../Core/Inc/position_sensor.h \
+ ../Core/Inc/drv8323.h
 
 ../Core/Inc/fsm.h:
 
@@ -122,6 +124,12 @@ Core/Src/fsm.o: ../Core/Src/fsm.c ../Core/Inc/fsm.h ../Core/Inc/usart.h \
 ../Core/Inc/tim.h:
 
 ../Core/Inc/position_sensor.h:
+
+../Core/Inc/preference_writer.h:
+
+../Core/Inc/flash_writer.h:
+
+../Core/Inc/stm32f4xx_flash.h:
 
 ../Core/Inc/fsm.h:
 

@@ -230,6 +230,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
 
+	/* Sample ADCs */
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
 	HAL_ADC_Start(&ADC_CH_MAIN);
 	//HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
@@ -240,15 +241,17 @@ void TIM1_UP_TIM10_IRQHandler(void)
 	controller.v_bus = controller.adc_vbus_raw*V_SCALE;
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
+	/* Sample position sensor */
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
 	ps_sample(&comm_encoder, .000025f);
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
+	/* run Finite State Machine */
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
 	run_fsm(&state);
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
-
+	/* increment loop count */
 	controller.loop_count++;
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
@@ -265,7 +268,6 @@ void USART2_IRQHandler(void)
 	HAL_UART_IRQHandler(&huart2);
 
 	char c = Serial2RxBuffer[0];
-	/* Escape to idle has top priority */
 	update_fsm(&state, c);
 
   /* USER CODE END USART2_IRQn 0 */
