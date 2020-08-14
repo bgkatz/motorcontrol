@@ -7,65 +7,69 @@
 
 
 #include "calibration.h"
+#include "hw_config.h"
+#include "user_config.h"
+#include <stdio.h>
+#include "usart.h"
+#include "math_ops.h"
 
-void order_phases(EncoderStruct *encoder, ControllerStruct *controller, PreferenceWriter *prefs){
-/*
-    ///Checks phase order, to ensure that positive Q current produces
-    ///torque in the positive direction wrt the position sensor.
-    printf("\n\r Checking phase ordering\n\r");
-    float theta_ref = 0;
-    float theta_actual = 0;
-    float v_d = V_CAL;                                                             //Put all volts on the D-Axis
-    float v_q = 0.0f;
-    float v_u, v_v, v_w = 0;
-    float dtc_u, dtc_v, dtc_w = .5f;
-    int sample_counter = 0;
+void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, PreferenceWriter *pr, int loop_count){
+	/* Checks phase order, to ensure that positive Q current produces
+	   torque in the positive direction wrt the position sensor */
 
-    ///Set voltage angle to zero, wait for rotor position to settle
-    abc(theta_ref, v_d, v_q, &v_u, &v_v, &v_w);                                 //inverse dq0 transform on voltages
-    svm(1.0, v_u, v_v, v_w, 0, &dtc_u, &dtc_v, &dtc_w);                            //space vector modulation
-    for(int i = 0; i<20000; i++){
+	if(!cal->started){
+		printf("Checking phase sign, pole pairs\r\n");
+		cal->started = 1;
+		cal->start_count = loop_count;
+	}
+	cal->time = (float)(loop_count - cal->start_count)*DT;
+
+    if(cal->time < 1.0f){
+        /* Set voltage angle to zero, wait for rotor position to settle */
+        cal->theta_ref = 0;//W_CAL*cal->time;
+        controller->v_d = V_CAL;
+        controller->v_q = 0.0f;
+        abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
+        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
         set_dtc(controller);
-        HAL_Delay(100);
-        }
-    //ps->ZeroPosition();
-    ps->Sample(DT);
-    wait_us(1000);
-    //float theta_start = ps->GetMechPositionFixed();                                  //get initial rotor position
-    float theta_start;
-    controller->i_b = I_SCALE*(float)(controller->adc2_raw - controller->adc2_offset);    //Calculate phase currents from ADC readings
-    controller->i_c = I_SCALE*(float)(controller->adc1_raw - controller->adc1_offset);
-    controller->i_a = -controller->i_b - controller->i_c;
-    dq0(controller->theta_elec, controller->i_a, controller->i_b, controller->i_c, &controller->i_d, &controller->i_q);    //dq0 transform on currents
-    float current = sqrt(pow(controller->i_d, 2) + pow(controller->i_q, 2));
-    printf("\n\rCurrent\n\r");
-    printf("%f    %f   %f\n\r\n\r", controller->i_d, controller->i_q, current);
-    /// Rotate voltage angle
-    while(theta_ref < 4*PI){                                                    //rotate for 2 electrical cycles
-        abc(theta_ref, v_d, v_q, &v_u, &v_v, &v_w);                             //inverse dq0 transform on voltages
-        svm(1.0, v_u, v_v, v_w, 0, &dtc_u, &dtc_v, &dtc_w);                        //space vector modulation
-        wait_us(100);
-        set_dtc(controller);
-       ps->Sample(DT);                                                            //sample position sensor
-       theta_actual = ps->GetMechPositionFixed();
-       if(theta_ref==0){theta_start = theta_actual;}
-       if(sample_counter > 200){
-           sample_counter = 0 ;
-        printf("%.4f   %.4f\n\r", theta_ref/(NPP), theta_actual);
-        }
-        sample_counter++;
-       theta_ref += 0.001f;
-        }
-    float theta_end = ps->GetMechPositionFixed();
-    int direction = (theta_end - theta_start)>0;
-    printf("Theta Start:   %f    Theta End:  %f\n\r", theta_start, theta_end);
-    printf("Direction:  %d\n\r", direction);
-    if(direction){printf("Phasing correct\n\r");}
-    else if(!direction){printf("Phasing incorrect.  Swapping phases V and W\n\r");}
-    PHASE_ORDER = direction;
-    */
+    	cal->theta_start = encoder->angle_multiturn[0];
+    	return;
+    }
+
+    else if(cal->time < 1.0f+2.0f*PI_F/W_CAL){
+    	cal->theta_ref = W_CAL*(cal->time-1.0f);
+    	abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
+    	svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
+    	set_dtc(controller);
+    	return;
+    }
+
+
+    controller->v_d = 0;
+	controller->v_q = 0.0f;
+	abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
+	svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
+	set_dtc(controller);
+
+	float theta_end = encoder->angle_multiturn[0];
+	cal->ppairs = round(2.0f*PI_F/fabsf(theta_end-cal->theta_start));
+
+	if(cal->theta_start < theta_end){
+		cal->phase_order = 0;
+		printf("Phase order correct\r\n");
+	}
+	else{
+		cal->phase_order = 1;
+		printf("Swapping phase sign\r\n");
+	}
+    printf("Pole Pairs: %d\r\n", cal->ppairs);
+    cal->done_ordering = 1;	// Finished checking phase order
 }
 
-void calibrate(EncoderStruct *encoder, ControllerStruct *controller, PreferenceWriter *prefs){
+void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, PreferenceWriter *pr){
+
+}
+
+void measure_lr(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, PreferenceWriter *pr){
 
 }

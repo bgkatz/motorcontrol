@@ -49,6 +49,7 @@
 #include "drv8323.h"
 #include "foc.h"
 #include "math_ops.h"
+#include "calibration.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -87,7 +88,7 @@ COMStruct com;
 FSMStruct state;
 EncoderStruct comm_encoder;
 DRVStruct drv;
-
+CalStruct comm_encoder_cal;
 
 uint8_t Serial2RxBuffer[1];
 

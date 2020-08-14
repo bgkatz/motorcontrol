@@ -243,7 +243,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
 	/* Sample position sensor */
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
-	ps_sample(&comm_encoder, .000025f);
+	ps_sample(&comm_encoder, DT);
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
 	/* run Finite State Machine */

@@ -14,6 +14,7 @@
 #include <stdint.h>
 
 #define N_POS_SAMPLES 20		// Number of position samples to store.  should put this somewhere else...
+#define N_LUT 128
 
 typedef struct{
 	union{
@@ -28,7 +29,7 @@ typedef struct{
 	float output_angle_multiturn;
 	int raw, count, old_count, turns;
 	int m_zero, e_zero;
-	int offset_lut[128];
+	int offset_lut[N_LUT];
 	uint8_t first_sample;
 } EncoderStruct;
 

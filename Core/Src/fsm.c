@@ -34,7 +34,9 @@
 		 break;
 
 	 case CALIBRATION_MODE:
-
+		 if(!comm_encoder_cal.done_ordering){
+			 order_phases(&comm_encoder, &controller, &comm_encoder_cal, &prefs, controller.loop_count);
+		 }
 		 break;
 
 	 case MOTOR_MODE:
@@ -82,6 +84,13 @@
 			break;
 		case CALIBRATION_MODE:
 			printf("Entering Calibration Mode\r\n");
+			/* zero out all calibrations before starting */
+			comm_encoder_cal.done_cal = 0;
+			comm_encoder_cal.done_ordering = 0;
+			comm_encoder_cal.started = 0;
+			comm_encoder.e_zero = 0;
+			memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
+			drv_enable_gd(drv);
 			break;
 
 		}
@@ -117,6 +126,7 @@
 			break;
 		case CALIBRATION_MODE:
 			printf("Exiting Calibration Mode\r\n");
+			drv_disable_gd(drv);
 			fsmstate->ready = 1;
 			break;
 		}
