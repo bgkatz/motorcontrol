@@ -90,6 +90,10 @@ EncoderStruct comm_encoder;
 DRVStruct drv;
 CalStruct comm_encoder_cal;
 
+/* init but don't allocate calibration arrays */
+int *error_array = NULL;
+int *lut_array = NULL;
+
 uint8_t Serial2RxBuffer[1];
 
 /* USER CODE END PV */
@@ -174,16 +178,18 @@ int main(void)
   else{
 
   }
+
+  init_controller_params(&controller);
   controller.invert_dtc = 1;		// 1 = invert duty cycle, 0 = don't.
-  PPAIRS = 7;
 
   /* commutation encoder setup */
   comm_encoder.m_zero = M_ZERO;
   comm_encoder.e_zero = E_ZERO;
   comm_encoder.ppairs = PPAIRS;
   ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
-  memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));	// Copy the linearization lookup table
-  memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut)); //delete me later
+
+  if(EN_ENC_LINEARIZATION){memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));}	// Copy the linearization lookup table
+  else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
 
   /* Turn on ADCs */
   HAL_ADC_Start(&hadc1);

@@ -9,6 +9,7 @@
 #include "position_sensor.h"
 #include "math_ops.h"
 #include "hw_config.h"
+#include "user_config.h"
 
 void ps_warmup(EncoderStruct * encoder, int n){
 	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
@@ -45,8 +46,8 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->count = encoder->raw + off_interp;
 
 	/* Real angles in radians */
-	encoder->angle_singleturn = 2.0f*PI_F*fmodf(((float)(encoder->count-encoder->m_zero))/((float)ENC_CPR), 1.0f);
-	encoder->elec_angle = 2.0f*PI_F*fmodf((encoder->ppairs*(float)(encoder->count-encoder->e_zero))/((float)ENC_CPR), 1.0f);
+	encoder->angle_singleturn = 2.0f*PI_F*fmodf(((float)(encoder->count-M_ZERO))/((float)ENC_CPR), 1.0f);
+	encoder->elec_angle = 2.0f*PI_F*fmodf((encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR), 1.0f);
 
 	/* Rollover */
 	int count_diff = encoder->count - encoder->old_count;

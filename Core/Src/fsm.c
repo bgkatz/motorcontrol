@@ -21,6 +21,7 @@
  void run_fsm(FSMStruct * fsmstate){
 	 /* run_fsm is run every commutation interrupt cycle */
 
+	 /* state transition management */
 	 if(fsmstate->next_state != fsmstate->state){
 		 fsm_exit_state(fsmstate);		// safely exit the old state
 		 if(fsmstate->ready){			// if the previous state is ready, enter the new state
@@ -30,19 +31,36 @@
 	 }
 
 	 switch(fsmstate->state){
+
 	 case MENU_MODE:
 		 break;
 
 	 case CALIBRATION_MODE:
 		 if(!comm_encoder_cal.done_ordering){
-			 order_phases(&comm_encoder, &controller, &comm_encoder_cal, &prefs, controller.loop_count);
+			 order_phases(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
 		 }
+		 else if(!comm_encoder_cal.done_cal){
+			 calibrate_encoder(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count, error_array, lut_array);
+		 }
+		 else{
+			 /* Exit calibration mode when done */
+			 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
+			 printf("E_ZERO: %d  %f\r\n", E_ZERO, 2.0f*PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
+			 if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+			 preference_writer_flush(&prefs);
+			 preference_writer_close(&prefs);
+			 preference_writer_load(prefs);
+
+			 update_fsm(fsmstate, 27);
+		 }
+
 		 break;
 
 	 case MOTOR_MODE:
 
 		 // get latest commands
 		 // torque_control
+		 controller.i_q_ref = .25f;
 		 commutate(&controller, &observer, &comm_encoder);
 
 		 break;
@@ -85,6 +103,7 @@
 		case CALIBRATION_MODE:
 			printf("Entering Calibration Mode\r\n");
 			/* zero out all calibrations before starting */
+
 			comm_encoder_cal.done_cal = 0;
 			comm_encoder_cal.done_ordering = 0;
 			comm_encoder_cal.started = 0;
@@ -127,6 +146,9 @@
 		case CALIBRATION_MODE:
 			printf("Exiting Calibration Mode\r\n");
 			drv_disable_gd(drv);
+			free(error_array);
+			free(lut_array);
+
 			fsmstate->ready = 1;
 			break;
 		}

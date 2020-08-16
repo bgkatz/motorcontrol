@@ -92,17 +92,17 @@ void zero_current(ControllerStruct *controller){
     }
 
 void init_controller_params(ControllerStruct *controller){
-    /*
+
 	controller->ki_d = KI_D;
     controller->ki_q = KI_Q;
     controller->k_d = K_SCALE*I_BW;
     controller->k_q = K_SCALE*I_BW;
-    controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*2.0f*PI);
+    controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*2.0f*PI_F);
     for(int i = 0; i<128; i++)
     {
         controller->inverter_tab[i] = 1.0f + 1.2f*exp(-0.0078125f*i/.032f);
     }
-    */
+
     }
 
 void reset_foc(ControllerStruct *controller){
@@ -206,7 +206,7 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        controller->i_b = I_SCALE*(float)(controller->adc_b_raw - controller->adc_b_offset);    // Calculate phase currents from ADC readings
        controller->i_c = I_SCALE*(float)(controller->adc_c_raw - controller->adc_c_offset);
        controller->i_a = -controller->i_b - controller->i_c;
-/*
+
        if((fabsf(controller->i_b) > 41.0f)|(fabsf(controller->i_c) > 41.0f)|(fabsf(controller->i_a) > 41.0f)){controller->oc_flag = 1;}
 
        dq0(controller->theta_elec, controller->i_a, controller->i_b, controller->i_c, &controller->i_d, &controller->i_q);    //dq0 transform on currents
@@ -262,9 +262,9 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        //linearize_dtc(&dtc_q);
        //controller->v_d = dtc_d*controller->v_bus;
        //controller->v_q = dtc_q*controller->v_bus;
-*/
-       controller->v_d = 0.f;
-       controller->v_q = 1.5f;
+
+       //controller->v_d = 0.f;
+       //controller->v_q = 1.5f;
 
        abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
@@ -294,3 +294,4 @@ void zero_commands(ControllerStruct * controller){
 	controller->p_des = 0;
 	controller->v_des = 0;
 }
+
