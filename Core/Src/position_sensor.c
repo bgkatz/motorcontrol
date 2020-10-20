@@ -48,6 +48,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	/* Real angles in radians */
 	encoder->angle_singleturn = 2.0f*PI_F*fmodf(((float)(encoder->count-M_ZERO))/((float)ENC_CPR), 1.0f);
 	encoder->elec_angle = 2.0f*PI_F*fmodf((encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR), 1.0f);
+	encoder->elec_angle = encoder->elec_angle + 2.0f*PI_F*(encoder->elec_angle<0);
 
 	/* Rollover */
 	int count_diff = encoder->count - encoder->old_count;
