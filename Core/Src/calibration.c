@@ -71,14 +71,13 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
     cal->done_ordering = 1;	// Finished checking phase order
 }
 
-void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, int loop_count,
+void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, int loop_count){
 	/* Calibrates e-zero and encoder nonliearity */
-	int *error_arr, int *lut_arr){
 
 
 	if(!cal->started){
-			error_array = malloc(sizeof(int)*cal->ppairs*128);
-			lut_array = malloc(sizeof(int)*cal->ppairs*128);
+			//error_array = malloc(sizeof(int)*cal->ppairs*128);
+			//lut_array = malloc(sizeof(int)*cal->ppairs*128);
 			printf("Starting offset cal and linearization\r\n");
 			cal->started = 1;
 			cal->start_count = loop_count;
@@ -97,6 +96,7 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
         svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
         set_dtc(controller);
     	cal->theta_start = encoder->angle_multiturn[0];
+    	cal->next_sample_time = cal->time;
     	return;
     }
     else if (cal->time < T1+2.0f*PI_F*PPAIRS/W_CAL){
@@ -105,43 +105,74 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 		abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
 		svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 		set_dtc(controller);
+		// sample SAMPLES_PER_PPAIR times per pole-pair
 		if(cal->time > cal->next_sample_time){
 			int count_ref = cal->theta_ref * (float)ENC_CPR/(2.0f*PI_F*PPAIRS);
 			int error = count_ref - encoder->raw;
-			error_array[cal->sample_count] = error + ENC_CPR*(error<0);
-			//printf("%d %d\r\n", count_ref, error_array[cal->sample_count]);
+			cal->error_arr[cal->sample_count] = error + ENC_CPR*(error<0);
+			printf("%d %d %d\r\n", cal->sample_count, count_ref, cal->error_arr[cal->sample_count]);
+			cal->next_sample_time += 2.0f*PI_F/(W_CAL*SAMPLES_PER_PPAIR);
+			if(cal->sample_count == PPAIRS*SAMPLES_PER_PPAIR-1){
+				return;
+			}
 			cal->sample_count++;
-			cal->next_sample_time += 2.0f*PI_F/(W_CAL*128.0f);
+
 		}
 		return;
     }
 	else if (cal->time < T1+4.0f*PI_F*PPAIRS/W_CAL){
-		// rotate voltage vector through one mechanical rotation
+		// rotate voltage vector through one mechanical rotation in the negative direction
 		cal->theta_ref -= W_CAL*DT;//(cal->time-T1);
 		abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
 		svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 		set_dtc(controller);
-		if((cal->time > cal->next_sample_time) && (cal->sample_count < cal->ppairs*128)){
+		// sample SAMPLES_PER_PPAIR times per pole-pair
+		if(cal->time > cal->next_sample_time){
 			int count_ref = cal->theta_ref * (float)ENC_CPR/(2.0f*PI_F*PPAIRS);
 			int error = count_ref - encoder->raw;
-			error_array[cal->sample_count] = (error_array[cal->sample_count] + (error+ENC_CPR*error<0))/2;
-			cal->sample_count++;
-			cal->next_sample_time += 2.0f*PI_F/(W_CAL*128.0f);
+			error = error + ENC_CPR*(error<0);
+			cal->error_arr[cal->sample_count] = (cal->error_arr[cal->sample_count] + error)/2;
+			printf("%d %d %d\r\n", cal->sample_count, count_ref, cal->error_arr[cal->sample_count]);
+			cal->sample_count--;
+			cal->next_sample_time += 2.0f*PI_F/(W_CAL*SAMPLES_PER_PPAIR);
 		}
 		return;
     }
 
-    int ezero_mean;
-	for(int i = 0; i<128*PPAIRS; i++){
-		ezero_mean += error_array[i];
-	}
-	E_ZERO = ezero_mean/(128*PPAIRS);
-
     controller->v_d = 0.0f;
-	controller->v_q = 0.0f;
-	abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-	svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-	set_dtc(controller);
+    controller->v_q = 0.0f;
+    abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
+    svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
+    set_dtc(controller);
+
+    // Calculate average offset
+    int ezero_mean = 0;
+	for(int i = 0; i<((int)PPAIRS*SAMPLES_PER_PPAIR); i++){
+		ezero_mean += cal->error_arr[i];
+	}
+	cal->ezero = ezero_mean/(SAMPLES_PER_PPAIR*PPAIRS);
+
+	// Moving average to filter out cogging ripple
+
+	int window = SAMPLES_PER_PPAIR;
+	int lut_offset = (ENC_CPR-cal->error_arr[0])*N_LUT/ENC_CPR;
+	for(int i = 0; i<N_LUT; i++){
+			int moving_avg = 0;
+			for(int j = (-window)/2; j<(window)/2; j++){
+				int index = i*PPAIRS*SAMPLES_PER_PPAIR/N_LUT + j;
+				if(index<0){index += (SAMPLES_PER_PPAIR*PPAIRS);}
+				else if(index>(SAMPLES_PER_PPAIR*PPAIRS-1)){index -= (SAMPLES_PER_PPAIR*PPAIRS);}
+				moving_avg += cal->error_arr[index];
+			}
+			moving_avg = moving_avg/window;
+			int lut_index = lut_offset + i;
+			if(lut_index>(N_LUT-1)){lut_index -= N_LUT;}
+			cal->lut_arr[lut_index] = moving_avg - cal->ezero;
+			printf("%d  %d\r\n", lut_index, moving_avg - cal->ezero);
+
+		}
+
+	cal->started = 0;
 	cal->done_cal = 1;
 }
 
