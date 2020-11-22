@@ -243,11 +243,11 @@ int main(void)
   while (1)
   {
 
-	  HAL_Delay(1);
+	  HAL_Delay(100);
 	  //printf("%f\r\n", controller.v_bus);
 	  //printf("%d\r\n", controller.adc_vbus_raw);
 	  //printf("%f  %f  %f %f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
-	  //drv_print_faults(drv);
+	  drv_print_faults(drv);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
 	  //HAL_Delay(100);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );
@@ -256,6 +256,10 @@ int main(void)
 	  //ps_sample(&comm_encoder, .000025f);
 	  //for(int i = 0; i<N_POS_SAMPLES; i++){ printf(" %.2f", comm_encoder.angle_multiturn[i]);}
 	  //printf("\r\n");
+
+	  if(state.state == MOTOR_MODE){
+		  printf("%.3f  %.3f\r\n", controller.dtheta_mech, controller.i_q_filt);
+	  }
 
 	  //printf("Main Loop Serial: %d", Serial2RxBuffer[1]);
     /* USER CODE END WHILE */

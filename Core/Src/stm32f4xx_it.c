@@ -231,14 +231,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
 
 	/* Sample ADCs */
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
-	HAL_ADC_Start(&ADC_CH_MAIN);
-	//HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
-
-	controller.adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IB);
-	controller.adc_c_raw = HAL_ADC_GetValue(&ADC_CH_IC);
-	controller.adc_vbus_raw = HAL_ADC_GetValue(&ADC_CH_VBUS);
-	controller.v_bus = controller.adc_vbus_raw*V_SCALE;
+	analog_sample(&controller);
 	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
 	/* Sample position sensor */

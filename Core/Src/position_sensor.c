@@ -59,29 +59,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->angle_multiturn[0] = encoder->angle_singleturn + 2.0f*PI_F*(float)encoder->turns;
 	encoder->output_angle_multiturn = encoder->angle_multiturn[0]*GR;
 
-	/** Velocity */
-	/*
-	float vel_sum;
-	for(int i = 0; i<N_POS_SAMPLES/2; i++){
-		vel_sum += (encoder->angle_multiturn[i] - encoder->angle_multiturn[i+(N_POS_SAMPLES/2)]);
-	}
-
-	float s2 = N_POS_SAMPLES*encoder->angle_multiturn[0];
-
-	encoder->velocity = vel_sum/(dt*(float)(N_POS_SAMPLES/2)*(float)(N_POS_SAMPLES/2));
-*/
-/*
-	float m = (float)N_POS_SAMPLES;
-	float w = 1.0f/m;
-	float q = 12.0f/(m*m*m - m);
-	float c1 = 0.0f;
-	float ibar = (m - 1.0f)/2.0f;
-	for(int i = 0; i<N_POS_SAMPLES; i++){
-		c1 += encoder->angle_multiturn[i]*q*(i - ibar);
-	}
-	encoder->vel2 = -c1/dt;
-	*/
-
+	/* Velocity */
 	encoder->velocity = (encoder->angle_multiturn[0] - encoder->angle_multiturn[N_POS_SAMPLES-1])/(dt*(float)N_POS_SAMPLES);
 	encoder->elec_velocity = encoder->ppairs*encoder->velocity;
 }
