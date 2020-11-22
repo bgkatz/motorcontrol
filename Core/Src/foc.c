@@ -15,17 +15,62 @@
 
 void set_dtc(ControllerStruct *controller){
 	/* Output duty cycle from controller to the pwm timer */
-
-	if(INVERT_DTC){
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_U, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_u));
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_V, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_v));
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_W, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_w));
+	uint32_t tim_ch_u;
+	uint32_t tim_ch_v;
+	uint32_t tim_ch_w;
+	/* Handle phase order swapping so that voltage/current/torque match encoder direction */
+	if(!PHASE_ORDER){
+		tim_ch_u = TIM_CH_U;
+		tim_ch_v = TIM_CH_V;
+		tim_ch_w = TIM_CH_W;
 	}
 	else{
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_U, ((TIM_PWM.Instance->ARR))*(controller->dtc_u));
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_V, ((TIM_PWM.Instance->ARR))*(controller->dtc_v));
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_W, ((TIM_PWM.Instance->ARR))*(controller->dtc_w));
+		tim_ch_u = TIM_CH_U;
+		tim_ch_v = TIM_CH_W;
+		tim_ch_w = TIM_CH_V;
 	}
+	tim_ch_u = TIM_CH_U;
+	tim_ch_v = TIM_CH_V;
+	tim_ch_w = TIM_CH_W;
+	/* Invert duty cycle if that's how hardware is configured */
+	if(INVERT_DTC){
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_u, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_u));
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_v, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_v));
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_w, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_w));
+	}
+	else{
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_u, ((TIM_PWM.Instance->ARR))*(controller->dtc_u));
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_v, ((TIM_PWM.Instance->ARR))*(controller->dtc_v));
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_w, ((TIM_PWM.Instance->ARR))*(controller->dtc_w));
+	}
+}
+
+void analog_sample (ControllerStruct *controller){
+	/* Sampe ADCs */
+	ADC_HandleTypeDef adc_ch_ia;
+	ADC_HandleTypeDef adc_ch_ib;
+	ADC_HandleTypeDef adc_ch_ic;
+
+	/* Handle phase order swapping so that voltage/current/torque match encoder direction */
+	if(!PHASE_ORDER){
+		//adc_ch_ia = ADC_CH_IA;
+		adc_ch_ib = ADC_CH_IB;
+		adc_ch_ic = ADC_CH_IC;
+	}
+	else{
+		//adc_ch_ia = ADC_CH_IA;
+		adc_ch_ib = ADC_CH_IC;
+		adc_ch_ic = ADC_CH_IB;
+	}
+	adc_ch_ib = ADC_CH_IB;
+	adc_ch_ic = ADC_CH_IC;
+	HAL_ADC_Start(&ADC_CH_MAIN);
+	//HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
+	//controller->adc_a_raw = HAL_ADC_GetValue(&adc_ch_ia);
+	controller->adc_b_raw = HAL_ADC_GetValue(&adc_ch_ib);
+	controller->adc_c_raw = HAL_ADC_GetValue(&adc_ch_ic);
+	controller->adc_vbus_raw = HAL_ADC_GetValue(&ADC_CH_VBUS);
+	controller->v_bus = controller->adc_vbus_raw*V_SCALE;
 }
 
 void abc( float theta, float d, float q, float *a, float *b, float *c){
@@ -183,7 +228,7 @@ float linearize_dtc(ControllerStruct *controller, float dtc)
 
 void field_weaken(ControllerStruct *controller)
 {
-	/*
+
        /// Field Weakening ///
 
        controller->fw_int += .001f*(0.5f*OVERMODULATION*controller->v_bus - controller->v_ref);
@@ -192,7 +237,7 @@ void field_weaken(ControllerStruct *controller)
        float q_max = sqrt(controller->i_max*controller->i_max - controller->i_d_ref*controller->i_d_ref);
        controller->i_q_ref = fmaxf(fminf(controller->i_q_ref, q_max), -q_max);
        //float i_cmd_mag_sq = controller->i_d_ref*controller->i_d_ref + controller->i_q_ref*controller->i_q_ref;
-*/
+
 }
 void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderStruct *encoder)
 {
@@ -264,7 +309,7 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        //controller->v_q = dtc_q*controller->v_bus;
 
        //controller->v_d = 0.f;
-       //controller->v_q = 1.5f;
+       //controller->v_q = 1.0f;
 
        abc(controller->theta_elec + 0.0f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
@@ -279,12 +324,12 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
 
 
 void torque_control(ControllerStruct *controller){
-/*
+
     float torque_ref = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
     //float torque_ref = -.1*(controller->p_des - controller->theta_mech);
     controller->i_q_ref = torque_ref/KT_OUT;
     controller->i_d_ref = 0.0f;
-  */
+
     }
 
 void zero_commands(ControllerStruct * controller){
