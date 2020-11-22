@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 fsm.c:133:7:fsm_exit_state	16	static
 fsm.c:236:7:enter_menu_state	8	static
 fsm.c:252:7:enter_setup_state	48	static
@@ -6,3 +7,13 @@ fsm.c:21:7:run_fsm	32	static
 fsm.c:267:7:process_user_input	24	static
 fsm.c:170:7:update_fsm	8	static
 fsm.c:323:7:enter_motor_mode	0	static
+=======
+fsm.c:118:7:fsm_exit_state	16	static
+fsm.c:224:7:enter_menu_state	8	static
+fsm.c:240:7:enter_setup_state	48	static
+fsm.c:81:7:fsm_enter_state	8	static
+fsm.c:21:7:run_fsm	24	static
+fsm.c:255:7:process_user_input	24	static
+fsm.c:158:7:update_fsm	8	static
+fsm.c:311:7:enter_motor_mode	0	static
+>>>>>>> parent of 88f986d... Encoder linearization works!(?)
