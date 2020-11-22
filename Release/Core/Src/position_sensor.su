@@ -1,3 +1,3 @@
 position_sensor.c:14:6:ps_warmup	40	static
 position_sensor.c:25:6:ps_sample	40	static
-position_sensor.c:67:6:ps_print	8	static
+position_sensor.c:89:6:ps_print	8	static

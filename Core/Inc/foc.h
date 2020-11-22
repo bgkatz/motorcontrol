@@ -14,7 +14,7 @@
 
 typedef struct{
 	uint32_t tim_ch_w;								// Terminal W timer channel
-    int adc_a_raw, adc_b_raw, adc_c_raw, adc_vbus_raw;      // Raw ADC Values
+    int adc_b_raw, adc_c_raw, adc_vbus_raw;      // Raw ADC Values
     float i_a, i_b, i_c;                                    // Phase currents
     float v_bus;                                            // DC link voltage
     float theta_mech, theta_elec;                           // Rotor mechanical and electrical angle
@@ -52,7 +52,6 @@ typedef struct{
     }   ObserverStruct;
 
 void set_dtc(ControllerStruct *controller);
-void analog_sample(ControllerStruct *controller);
 void abc(float theta, float d, float q, float *a, float *b, float *c);
 void dq0(float theta, float a, float b, float c, float *d, float *q);
 void svm(float v_bus, float u, float v, float w, float *dtc_u, float *dtc_v, float *dtc_w);

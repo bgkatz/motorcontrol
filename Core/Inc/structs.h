@@ -7,7 +7,9 @@
 
 #ifndef STRUCTS_H
 #define STRUCTS_H
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 

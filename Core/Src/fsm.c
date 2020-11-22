@@ -65,15 +65,8 @@
 	 case MOTOR_MODE:
 
 		 // get latest commands
-		 //controller.kp = 0;
-		 //controller.kd = .02;
-		 //controller.t_ff = 0;
-		 //controller.v_des = 2;
-		 //controller.p_des = 0;
-		 //
-		 //torque_control(&controller);
-		 //field_weaken(&controller);
-		 controller.i_q_ref = 1.0f;
+		 // torque_control
+		 controller.i_q_ref = .25f;
 		 commutate(&controller, &observer, &comm_encoder);
 
 		 break;
