@@ -40,23 +40,17 @@
 			 order_phases(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
 		 }
 		 else if(!comm_encoder_cal.done_cal){
-			 calibrate_encoder(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
+			 calibrate_encoder(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count, error_array, lut_array);
 		 }
 		 else{
-			 /* Exit calibration mode when done, save data*/
+			 /* Exit calibration mode when done */
 			 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
-				E_ZERO = comm_encoder_cal.ezero;
-				memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
-				printf("E_ZERO: %d  %f\r\n", E_ZERO, 2.0f*PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
-				if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
-				preference_writer_flush(&prefs);
-				preference_writer_close(&prefs);
-				preference_writer_load(prefs);
-				//free(error_array);
-				//free(lut_array);
-				for(int i = 0; i<(N_LUT); i++){
-					printf("%d\r\n", comm_encoder_cal.lut_arr[i]);
-				}
+			 printf("E_ZERO: %d  %f\r\n", E_ZERO, 2.0f*PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
+			 if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+			 preference_writer_flush(&prefs);
+			 preference_writer_close(&prefs);
+			 preference_writer_load(prefs);
+
 			 update_fsm(fsmstate, 27);
 		 }
 
@@ -121,9 +115,7 @@
 			comm_encoder_cal.done_ordering = 0;
 			comm_encoder_cal.started = 0;
 			comm_encoder.e_zero = 0;
-			E_ZERO = 0;
 			memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
-			memset(&comm_encoder_cal, 0, sizeof(comm_encoder_cal));
 			drv_enable_gd(drv);
 			break;
 
@@ -161,6 +153,9 @@
 		case CALIBRATION_MODE:
 			printf("Exiting Calibration Mode\r\n");
 			drv_disable_gd(drv);
+			free(error_array);
+			free(lut_array);
+
 			fsmstate->ready = 1;
 			break;
 		}
