@@ -89,6 +89,8 @@ FSMStruct state;
 EncoderStruct comm_encoder;
 DRVStruct drv;
 CalStruct comm_encoder_cal;
+CANMessage can_rx_msg;
+CANMessage can_tx_msg;
 
 /* init but don't allocate calibration arrays */
 int *error_array = NULL;
@@ -180,7 +182,6 @@ int main(void)
   }
 
   init_controller_params(&controller);
-  controller.invert_dtc = 1;		// 1 = invert duty cycle, 0 = don't.
 
   /* commutation encoder setup */
   comm_encoder.m_zero = M_ZERO;
@@ -205,23 +206,25 @@ int main(void)
   HAL_Delay(1);
   drv_write_DCR(drv, 0x0, DIS_GDF_EN, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1);
   HAL_Delay(1);
+   drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_DEG_8US, OCP_DEG_8US, VDS_LVL_1_88);
+  HAL_Delay(1);
   drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x1, 0x1, 0x1, SEN_LVL_1_0);
   HAL_Delay(1);
   zero_current(&controller);
   HAL_Delay(1);
-  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x1, 0x0, 0x0, 0x0, SEN_LVL_1_0);
-  HAL_Delay(1);
-  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_DEG_8US, OCP_DEG_8US, VDS_LVL_1_88);
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x0, 0x0, 0x0, SEN_LVL_1_0);
+
   HAL_Delay(1);
   drv_disable_gd(drv);
   HAL_Delay(1);
   //drv_enable_gd(drv);   */
-  printf("ADC B OFFSET: %d     ADC C OFFSET: %d\r\n", controller.adc_b_offset, controller.adc_c_offset);
+  printf("ADC A OFFSET: %d     ADC B OFFSET: %d\r\n", controller.adc_a_offset, controller.adc_b_offset);
+  printf("E_ZERO: %d  %f\r\n", E_ZERO, 2.0f*PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
 
   /* Turn on PWM */
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&TIM_PWM, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&TIM_PWM, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&TIM_PWM, TIM_CHANNEL_3);
 
   /* Start the FSM */
   state.state = MENU_MODE;
@@ -230,8 +233,20 @@ int main(void)
 
   /* Turn on interrupts */
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
-  HAL_TIM_Base_Start_IT(&htim1);
+  HAL_TIM_Base_Start_IT(&TIM_PWM);
 
+  /* Turn on CAN interrupt */
+  HAL_CAN_MspInit(&CAN_H);
+
+  CAN_TxHeaderTypeDef pHeader; //declare a specific header for message transmittions
+  CAN_RxHeaderTypeDef pRxHeader; //declare header for message reception
+  uint32_t TxMailbox;
+  uint8_t a,r; //declare byte to be transmitted //declare a receive byte
+
+	pHeader.DLC=1; //give message size of 1 byte
+	pHeader.IDE=CAN_ID_STD; //set identifier to standard
+	pHeader.RTR=CAN_RTR_DATA; //set data type to remote transmission request?
+	pHeader.StdId=CAN_ID; //define a standard identifier, used for message identification by filters (switch this for the other microcontroller)
 
 
   /* USER CODE END 2 */
@@ -243,7 +258,7 @@ int main(void)
   while (1)
   {
 
-	  HAL_Delay(100);
+	  HAL_Delay(10);
 	  //printf("%f\r\n", controller.v_bus);
 	  //printf("%d\r\n", controller.adc_vbus_raw);
 	  //printf("%f  %f  %f %f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
@@ -252,13 +267,16 @@ int main(void)
 	  //HAL_Delay(100);
 	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );
 	  //printf("hello\r\n");
-	  //printf("%f  %f  %f\r\n", comm_encoder.angle_multiturn[0], comm_encoder.velocity, comm_encoder.vel2);
+	  //printf("%.3f  %.3f\r\n", comm_encoder.velocity, comm_encoder.vel2);
 	  //ps_sample(&comm_encoder, .000025f);
 	  //for(int i = 0; i<N_POS_SAMPLES; i++){ printf(" %.2f", comm_encoder.angle_multiturn[i]);}
 	  //printf("\r\n");
+	  HAL_CAN_AddTxMessage(&CAN_H, &pHeader, &a, &TxMailbox);  //function to add message for transmition
 
 	  if(state.state == MOTOR_MODE){
-		  printf("%.3f  %.3f\r\n", controller.dtheta_mech, controller.i_q_filt);
+		  //printf("%.3f  %.3f  %.3f  %.3f  %.3f\r\n", controller.v_q, controller.v_d, controller.i_q_filt, controller.i_d_filt, comm_encoder.elec_velocity);
+		  //printf("%.3f  %.3f  %.3f  %.3f  %.3f\r\n", controller.theta_elec, controller.i_q_filt, controller.i_a, controller.i_b, controller.i_c);
+		  //printf("%d  %d  %d\r\n", controller.adc_b_raw, controller.adc_c_raw, controller.adc_vbus_raw);
 	  }
 
 	  //printf("Main Loop Serial: %d", Serial2RxBuffer[1]);

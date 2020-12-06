@@ -107,9 +107,9 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 		set_dtc(controller);
 		if(cal->time > cal->next_sample_time){
 			int count_ref = cal->theta_ref * (float)ENC_CPR/(2.0f*PI_F*PPAIRS);
-			int error = count_ref - encoder->raw;
+			int error =  encoder->raw - count_ref;
 			error_array[cal->sample_count] = error + ENC_CPR*(error<0);
-			//printf("%d %d\r\n", count_ref, error_array[cal->sample_count]);
+			//printf("%d %d\r\n", count_ref,encoder->raw);
 			cal->sample_count++;
 			cal->next_sample_time += 2.0f*PI_F/(W_CAL*128.0f);
 		}
@@ -123,7 +123,7 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 		set_dtc(controller);
 		if((cal->time > cal->next_sample_time) && (cal->sample_count < cal->ppairs*128)){
 			int count_ref = cal->theta_ref * (float)ENC_CPR/(2.0f*PI_F*PPAIRS);
-			int error = count_ref - encoder->raw;
+			int error = encoder->raw - count_ref;
 			error_array[cal->sample_count] = (error_array[cal->sample_count] + (error+ENC_CPR*error<0))/2;
 			cal->sample_count++;
 			cal->next_sample_time += 2.0f*PI_F/(W_CAL*128.0f);

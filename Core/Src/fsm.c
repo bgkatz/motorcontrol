@@ -67,7 +67,6 @@
 		 //
 		 //torque_control(&controller);
 		 //field_weaken(&controller);
-		 controller.i_q_ref = 1.0f;
 		 commutate(&controller, &observer, &comm_encoder);
 
 		 break;
@@ -91,7 +90,7 @@
 
 		switch(fsmstate->state){
 		case MENU_MODE:
-			printf("Entering Main Menu\r\n");
+			//printf("Entering Main Menu\r\n");
 			enter_menu_state();
 			break;
 		case SETUP_MODE:
@@ -102,10 +101,14 @@
 			printf("Entering Encoder Mode\r\n");
 			break;
 		case MOTOR_MODE:
-			printf("Entering Motor Mode\r\n");
+			//printf("Entering Motor Mode\r\n");
 			HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
 			reset_foc(&controller);
 			drv_enable_gd(drv);
+
+			//controller.i_q_des = 3.0f;
+			//controller.i_d_des = -3.0f;
+			//controller.t_ff = 3.0f;
 			break;
 		case CALIBRATION_MODE:
 			printf("Entering Calibration Mode\r\n");
@@ -128,7 +131,7 @@
 
 		switch(fsmstate->state){
 		case MENU_MODE:
-			printf("Leaving Main Menu\r\n");
+			//printf("Leaving Main Menu\r\n");
 			fsmstate->ready = 1;
 			break;
 		case SETUP_MODE:
@@ -141,11 +144,11 @@
 			break;
 		case MOTOR_MODE:
 			/* Don't stop commutating if there are high currents or FW happening */
-			if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
+			if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) && fabs(controller.dtheta_elec)<100.0f ){
 				fsmstate->ready = 1;
 				drv_disable_gd(drv);
 				reset_foc(&controller);
-				printf("Leaving Motor Mode\r\n");
+				//printf("Leaving Motor Mode\r\n");
 				HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
 			}
 			zero_commands(&controller);		// Set commands to zero
@@ -232,6 +235,7 @@
 	    //drv.disable_gd();
 	    //reset_foc(&controller);
 	    //gpio.enable->write(0);
+	 /*
 	    printf("\n\r\n\r");
 	    printf(" Commands:\n\r");
 	    printf(" m - Motor Mode\n\r");
@@ -240,6 +244,7 @@
 	    printf(" e - Display Encoder\n\r");
 	    printf(" z - Set Zero Position\n\r");
 	    printf(" esc - Exit to Menu\n\r");
+	    */
 
 	    //gpio.led->write(0);
  }

@@ -24,14 +24,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
-#include "structs.h"
 #include "usart.h"
-#include "fsm.h"
-#include "spi.h"
 #include "gpio.h"
-#include "adc.h"
-#include "foc.h"
-#include "position_sensor.h"
 #include "hw_config.h"
 /* USER CODE END Includes */
 
@@ -220,6 +214,7 @@ void CAN1_RX0_IRQHandler(void)
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
 
+  printf("got some can\r\n");
   /* USER CODE END CAN1_RX0_IRQn 1 */
 }
 
@@ -230,22 +225,6 @@ void TIM1_UP_TIM10_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
 
-	/* Sample ADCs */
-	analog_sample(&controller);
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
-
-	/* Sample position sensor */
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
-	ps_sample(&comm_encoder, DT);
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
-
-	/* run Finite State Machine */
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
-	run_fsm(&state);
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
-
-	/* increment loop count */
-	controller.loop_count++;
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
@@ -261,7 +240,6 @@ void USART2_IRQHandler(void)
 	HAL_UART_IRQHandler(&huart2);
 
 	char c = Serial2RxBuffer[0];
-	update_fsm(&state, c);
 
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
