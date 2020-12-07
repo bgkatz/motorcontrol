@@ -236,17 +236,41 @@ int main(void)
   HAL_TIM_Base_Start_IT(&TIM_PWM);
 
   /* Turn on CAN interrupt */
-  HAL_CAN_MspInit(&CAN_H);
+  //HAL_CAN_MspInit(&CAN_H);
 
   CAN_TxHeaderTypeDef pHeader; //declare a specific header for message transmittions
   CAN_RxHeaderTypeDef pRxHeader; //declare header for message reception
   uint32_t TxMailbox;
-  uint8_t a,r; //declare byte to be transmitted //declare a receive byte
+  uint8_t a[2];
+  uint8_t r[2]; //declare byte to be transmitted //declare a receive byte
 
 	pHeader.DLC=1; //give message size of 1 byte
 	pHeader.IDE=CAN_ID_STD; //set identifier to standard
 	pHeader.RTR=CAN_RTR_DATA; //set data type to remote transmission request?
-	pHeader.StdId=CAN_ID; //define a standard identifier, used for message identification by filters (switch this for the other microcontroller)
+	pHeader.StdId=0; //define a standard identifier, used for message identification by filters (switch this for the other microcontroller)
+
+/*
+	pRxHeader.DLC = 2;
+	pRxHeader.IDE = CAN_ID_STD;
+	pRxHeader.RTR = CAN_RTR_DATA;
+	pRxHeader.StdId = 1;
+*/
+    CAN_FilterTypeDef sFilterConfig; //declare CAN filter structure
+
+	sFilterConfig.FilterFIFOAssignment=CAN_FILTER_FIFO0; //set fifo assignment
+	sFilterConfig.FilterIdHigh=CAN_ID<<5; //the ID that the filter looks for (switch this for the other microcontroller)
+	sFilterConfig.FilterIdLow=0x0;
+	sFilterConfig.FilterMaskIdHigh=0xFFF;
+	sFilterConfig.FilterMaskIdLow=0;
+	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	sFilterConfig.FilterScale=CAN_FILTERSCALE_32BIT; //set filter scale
+	sFilterConfig.FilterActivation=ENABLE;
+
+	HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig); //configure CAN filter
+
+	HAL_CAN_Start(&hcan1); //start CAN
+	//HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING); //enable interrupts
+    //HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 2, 0); // Reduce CAN ISR priority
 
 
   /* USER CODE END 2 */
@@ -271,7 +295,13 @@ int main(void)
 	  //ps_sample(&comm_encoder, .000025f);
 	  //for(int i = 0; i<N_POS_SAMPLES; i++){ printf(" %.2f", comm_encoder.angle_multiturn[i]);}
 	  //printf("\r\n");
-	  HAL_CAN_AddTxMessage(&CAN_H, &pHeader, &a, &TxMailbox);  //function to add message for transmition
+	  //HAL_CAN_AddTxMessage(&CAN_H, &pHeader, &a, &TxMailbox);  //function to add message for transmition
+
+	  HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &pRxHeader, &r);
+
+	  for(int i = 0; i<8; i++){printf("%d ", r[i]);}
+	  printf("\r\n");
+	  //printf("%d  %d\r\n", r[0], r[1]);
 
 	  if(state.state == MOTOR_MODE){
 		  //printf("%.3f  %.3f  %.3f  %.3f  %.3f\r\n", controller.v_q, controller.v_d, controller.i_q_filt, controller.i_d_filt, comm_encoder.elec_velocity);
