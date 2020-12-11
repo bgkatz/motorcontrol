@@ -235,7 +235,7 @@
 	    //drv.disable_gd();
 	    //reset_foc(&controller);
 	    //gpio.enable->write(0);
-	 /*
+
 	    printf("\n\r\n\r");
 	    printf(" Commands:\n\r");
 	    printf(" m - Motor Mode\n\r");
@@ -244,7 +244,7 @@
 	    printf(" e - Display Encoder\n\r");
 	    printf(" z - Set Zero Position\n\r");
 	    printf(" esc - Exit to Menu\n\r");
-	    */
+
 
 	    //gpio.led->write(0);
  }
