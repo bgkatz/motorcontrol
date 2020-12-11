@@ -7,6 +7,6 @@ stm32f4xx_it.c:149:6:SVC_Handler	0	static
 stm32f4xx_it.c:162:6:DebugMon_Handler	0	static
 stm32f4xx_it.c:175:6:PendSV_Handler	0	static
 stm32f4xx_it.c:188:6:SysTick_Handler	0	static
-stm32f4xx_it.c:209:6:CAN1_RX0_IRQHandler	0	static
+stm32f4xx_it.c:209:6:CAN1_RX0_IRQHandler	8	static
 stm32f4xx_it.c:224:6:TIM1_UP_TIM10_IRQHandler	0	static
 stm32f4xx_it.c:237:6:USART2_IRQHandler	8	static

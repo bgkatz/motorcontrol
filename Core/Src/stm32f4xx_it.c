@@ -214,7 +214,7 @@ void CAN1_RX0_IRQHandler(void)
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
 
-  //printf("got some can\r\n");
+  printf("got some can\r\n");
   /* USER CODE END CAN1_RX0_IRQn 1 */
 }
 
