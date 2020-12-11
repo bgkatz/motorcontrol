@@ -297,7 +297,7 @@ int main(void)
 	  //printf("\r\n");
 	  //HAL_CAN_AddTxMessage(&CAN_H, &pHeader, &a, &TxMailbox);  //function to add message for transmition
 
-	  //HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &pRxHeader, &r);
+	  HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &pRxHeader, &r);
 
 	  for(int i = 0; i<8; i++){printf("%d ", r[i]);}
 	  printf("\r\n");
