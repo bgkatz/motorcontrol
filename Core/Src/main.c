@@ -89,6 +89,8 @@ FSMStruct state;
 EncoderStruct comm_encoder;
 DRVStruct drv;
 CalStruct comm_encoder_cal;
+CANMessage can_tx;
+CANMessage can_rx;
 
 /* init but don't allocate calibration arrays */
 int *error_array = NULL;
@@ -180,7 +182,6 @@ int main(void)
   }
 
   init_controller_params(&controller);
-  controller.invert_dtc = 1;		// 1 = invert duty cycle, 0 = don't.
 
   /* commutation encoder setup */
   comm_encoder.m_zero = M_ZERO;
@@ -223,15 +224,39 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
 
+  /* CAN setup */
+  can_tx.len = 6;
+  can_rx.len = 8;
+  can_rx_init(&can_rx);
+
   /* Start the FSM */
   state.state = MENU_MODE;
   state.next_state = MENU_MODE;
   state.ready = 1;
 
+
   /* Turn on interrupts */
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
   HAL_TIM_Base_Start_IT(&htim1);
 
+  CAN_TxHeaderTypeDef pHeader; //declare a specific header for message transmittions
+  CAN_RxHeaderTypeDef pRxHeader; //declare header for message reception
+  uint32_t TxMailbox;
+  uint8_t a[2];
+  uint8_t r[2]; //declare byte to be transmitted //declare a receive byte
+
+	pHeader.DLC=1; //give message size of 1 byte
+	pHeader.IDE=CAN_ID_STD; //set identifier to standard
+	pHeader.RTR=CAN_RTR_DATA; //set data type to remote transmission request?
+	pHeader.StdId=0; //define a standard identifier, used for message identification by filters (switch this for the other microcontroller)
+
+/*
+	pRxHeader.DLC = 2;
+	pRxHeader.IDE = CAN_ID_STD;
+	pRxHeader.RTR = CAN_RTR_DATA;
+	pRxHeader.StdId = 1;
+*/
+	HAL_CAN_Start(&CAN_H); //start CAN
 
 
   /* USER CODE END 2 */
@@ -244,6 +269,12 @@ int main(void)
   {
 
 	  HAL_Delay(100);
+
+	  HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &pRxHeader, &r);
+
+	  for(int i = 0; i<8; i++){printf("%d ", r[i]);}
+	  printf("\r\n");
+
 	  //printf("%f\r\n", controller.v_bus);
 	  //printf("%d\r\n", controller.adc_vbus_raw);
 	  //printf("%f  %f  %f %f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);

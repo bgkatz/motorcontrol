@@ -22,6 +22,7 @@
 #include "drv8323.h"
 #include "foc.h"
 #include "calibration.h"
+#include "can.h"
 
 typedef struct{
     } GPIOStruct;
@@ -39,5 +40,7 @@ extern EncoderStruct comm_encoder;
 extern DRVStruct drv;
 extern PreferenceWriter prefs;
 extern CalStruct comm_encoder_cal;
+extern CANMessage can_tx;
+extern CANMessage can_rx;
 
 #endif
