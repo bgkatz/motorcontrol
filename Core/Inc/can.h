@@ -33,28 +33,13 @@
 extern CAN_HandleTypeDef hcan1;
 
 /* USER CODE BEGIN Private defines */
-#define P_MIN -12.5f
-#define P_MAX 12.5f
-#define V_MIN -65.0f
-#define V_MAX 65.0f
-#define KP_MIN 0.0f
-#define KP_MAX 500.0f
-#define KD_MIN 0.0f
-#define KD_MAX 5.0f
-#define T_MIN -18.0f
-#define T_MAX 18.0f
+
 /* USER CODE END Private defines */
 
 void MX_CAN1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-typedef struct{
-	uint8_t id;
-	int data[8];
-}CANMessage ;
 
-void pack_reply(CANMessage *msg, uint8_t id, float p, float v, float t);
-void unpack_cmd(CANMessage msg);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

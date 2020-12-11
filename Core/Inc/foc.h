@@ -26,8 +26,8 @@ typedef struct{
     float v_u, v_v, v_w;                                    // Terminal voltages
     float k_d, k_q, ki_d, ki_q, alpha;                      // Current loop gains, current reference filter coefficient
     float d_int, q_int;                                     // Current error integrals
-    int adc_a_offset, adc_b_offset, adc_c_offset, adc_vbus_offset; 		// ADC offsets
-    float i_d_des, i_q_des, i_d_des_filt, i_q_des_filt;     // Current references
+    int adc_b_offset, adc_c_offset, adc_vbus_offset; 		// ADC offsets
+    float i_d_ref, i_q_ref, i_d_ref_filt, i_q_ref_filt;     // Current references
     int loop_count;                                         // Degubbing counter
     int timeout;                                            // Watchdog counter
     int mode;
