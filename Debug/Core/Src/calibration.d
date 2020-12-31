@@ -1,6 +1,10 @@
-Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp \
- ../Core/Inc/PreferenceWriter.h ../Core/Inc/FlashWriter.h \
- ../Core/Inc/stm32f4xx_flash.h \
+Core/Src/calibration.o: ../Core/Src/calibration.c \
+ ../Core/Inc/calibration.h ../Core/Inc/position_sensor.h \
+ ../Core/Inc/spi.h ../Core/Inc/main.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
+ ../Core/Inc/stm32f4xx_hal_conf.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h \
  ../Drivers/CMSIS/Include/core_cm4.h \
@@ -9,10 +13,6 @@ Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp \
  ../Drivers/CMSIS/Include/cmsis_gcc.h \
  ../Drivers/CMSIS/Include/mpu_armv7.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
- ../Core/Inc/stm32f4xx_hal_conf.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h \
@@ -33,13 +33,24 @@ Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/FlashWriter.h ../Core/Inc/user_config.h
+ ../Core/Inc/foc.h ../Core/Inc/hw_config.h ../Core/Inc/user_config.h \
+ ../Core/Inc/usart.h ../Core/Inc/math_ops.h
 
-../Core/Inc/PreferenceWriter.h:
+../Core/Inc/calibration.h:
 
-../Core/Inc/FlashWriter.h:
+../Core/Inc/position_sensor.h:
 
-../Core/Inc/stm32f4xx_flash.h:
+../Core/Inc/spi.h:
+
+../Core/Inc/main.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
+
+../Core/Inc/stm32f4xx_hal_conf.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:
 
@@ -56,14 +67,6 @@ Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp \
 ../Drivers/CMSIS/Include/mpu_armv7.h:
 
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h:
-
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
-
-../Core/Inc/stm32f4xx_hal_conf.h:
-
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
-
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
 
@@ -105,6 +108,12 @@ Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp \
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-../Core/Inc/FlashWriter.h:
+../Core/Inc/foc.h:
+
+../Core/Inc/hw_config.h:
 
 ../Core/Inc/user_config.h:
+
+../Core/Inc/usart.h:
+
+../Core/Inc/math_ops.h:

@@ -5,8 +5,11 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Core/Src/adc.c \
+../Core/Src/calibration.c \
 ../Core/Src/can.c \
+../Core/Src/drv8323.c \
 ../Core/Src/flash_writer.c \
+../Core/Src/foc.c \
 ../Core/Src/fsm.c \
 ../Core/Src/gpio.c \
 ../Core/Src/main.c \
@@ -23,36 +26,13 @@ C_SRCS += \
 ../Core/Src/tim.c \
 ../Core/Src/usart.c 
 
-CPP_SRCS += \
-../Core/Src/FlashWriter.cpp \
-../Core/Src/PrefrenceWriter.cpp 
-
-OBJS += \
-./Core/Src/FlashWriter.o \
-./Core/Src/PrefrenceWriter.o \
-./Core/Src/adc.o \
-./Core/Src/can.o \
-./Core/Src/flash_writer.o \
-./Core/Src/fsm.o \
-./Core/Src/gpio.o \
-./Core/Src/main.o \
-./Core/Src/math_ops.o \
-./Core/Src/position_sensor.o \
-./Core/Src/preference_writer.o \
-./Core/Src/spi.o \
-./Core/Src/stm32f4xx_flash.o \
-./Core/Src/stm32f4xx_hal_msp.o \
-./Core/Src/stm32f4xx_it.o \
-./Core/Src/syscalls.o \
-./Core/Src/sysmem.o \
-./Core/Src/system_stm32f4xx.o \
-./Core/Src/tim.o \
-./Core/Src/usart.o 
-
 C_DEPS += \
 ./Core/Src/adc.d \
+./Core/Src/calibration.d \
 ./Core/Src/can.d \
+./Core/Src/drv8323.d \
 ./Core/Src/flash_writer.d \
+./Core/Src/foc.d \
 ./Core/Src/fsm.d \
 ./Core/Src/gpio.d \
 ./Core/Src/main.d \
@@ -69,22 +49,43 @@ C_DEPS += \
 ./Core/Src/tim.d \
 ./Core/Src/usart.d 
 
-CPP_DEPS += \
-./Core/Src/FlashWriter.d \
-./Core/Src/PrefrenceWriter.d 
+OBJS += \
+./Core/Src/adc.o \
+./Core/Src/calibration.o \
+./Core/Src/can.o \
+./Core/Src/drv8323.o \
+./Core/Src/flash_writer.o \
+./Core/Src/foc.o \
+./Core/Src/fsm.o \
+./Core/Src/gpio.o \
+./Core/Src/main.o \
+./Core/Src/math_ops.o \
+./Core/Src/position_sensor.o \
+./Core/Src/preference_writer.o \
+./Core/Src/spi.o \
+./Core/Src/stm32f4xx_flash.o \
+./Core/Src/stm32f4xx_hal_msp.o \
+./Core/Src/stm32f4xx_it.o \
+./Core/Src/syscalls.o \
+./Core/Src/sysmem.o \
+./Core/Src/system_stm32f4xx.o \
+./Core/Src/tim.o \
+./Core/Src/usart.o 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-Core/Src/FlashWriter.o: ../Core/Src/FlashWriter.cpp
-	arm-none-eabi-g++ "$<" -mcpu=cortex-m4 -std=gnu++14 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-use-cxa-atexit -Wall -fstack-usage -MMD -MP -MF"Core/Src/FlashWriter.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
-Core/Src/PrefrenceWriter.o: ../Core/Src/PrefrenceWriter.cpp
-	arm-none-eabi-g++ "$<" -mcpu=cortex-m4 -std=gnu++14 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -fno-exceptions -fno-rtti -fno-threadsafe-statics -fno-use-cxa-atexit -Wall -fstack-usage -MMD -MP -MF"Core/Src/PrefrenceWriter.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/adc.o: ../Core/Src/adc.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/adc.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+Core/Src/calibration.o: ../Core/Src/calibration.c
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/calibration.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/can.o: ../Core/Src/can.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/can.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+Core/Src/drv8323.o: ../Core/Src/drv8323.c
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/drv8323.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/flash_writer.o: ../Core/Src/flash_writer.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/flash_writer.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+Core/Src/foc.o: ../Core/Src/foc.c
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/foc.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/fsm.o: ../Core/Src/fsm.c
 	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DSTM32F446xx -DDEBUG -c -I../Drivers/CMSIS/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/fsm.d" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 Core/Src/gpio.o: ../Core/Src/gpio.c

@@ -1,0 +1,14 @@
+drv8323.c:14:10:drv_spi_write	24	static
+drv8323.c:22:10:drv_read_FSR1	16	static
+drv8323.c:26:10:drv_read_FSR2	16	static
+drv8323.c:30:10:drv_read_register	24	static
+drv8323.c:33:6:drv_write_register	32	static
+drv8323.c:36:6:drv_write_DCR	40	static
+drv8323.c:40:6:drv_write_HSR	40	static
+drv8323.c:44:6:drv_write_LSR	40	static
+drv8323.c:48:6:drv_write_OCPCR	40	static
+drv8323.c:52:6:drv_write_CSACR	40	static
+drv8323.c:56:6:drv_enable_gd	24	static
+drv8323.c:60:6:drv_disable_gd	24	static
+drv8323.c:64:6:drv_calibrate	24	static
+drv8323.c:68:6:drv_print_faults	24	static

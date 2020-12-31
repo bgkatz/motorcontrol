@@ -1,3 +1,3 @@
-main.c:106:5:main	16	static
-main.c:206:6:SystemClock_Config	88	static
-main.c:260:6:Error_Handler	4	static
+main.c:121:5:main	112	static
+main.c:310:6:SystemClock_Config	88	static
+main.c:364:6:Error_Handler	4	static

@@ -1,5 +1,9 @@
-Core/Src/FlashWriter.o: ../Core/Src/FlashWriter.cpp \
- ../Core/Inc/stm32f4xx_flash.h \
+Core/Src/foc.o: ../Core/Src/foc.c ../Core/Inc/foc.h \
+ ../Core/Inc/position_sensor.h ../Core/Inc/spi.h ../Core/Inc/main.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
+ ../Core/Inc/stm32f4xx_hal_conf.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h \
  ../Drivers/CMSIS/Include/core_cm4.h \
@@ -8,10 +12,6 @@ Core/Src/FlashWriter.o: ../Core/Src/FlashWriter.cpp \
  ../Drivers/CMSIS/Include/cmsis_gcc.h \
  ../Drivers/CMSIS/Include/mpu_armv7.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
- ../Core/Inc/stm32f4xx_hal_conf.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
- ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h \
@@ -32,9 +32,24 @@ Core/Src/FlashWriter.o: ../Core/Src/FlashWriter.cpp \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/FlashWriter.h ../Core/Inc/stm32f4xx_flash.h
+ ../Core/Inc/adc.h ../Core/Inc/tim.h ../Core/Inc/position_sensor.h \
+ ../Core/Inc/math_ops.h ../Core/Inc/hw_config.h ../Core/Inc/user_config.h
 
-../Core/Inc/stm32f4xx_flash.h:
+../Core/Inc/foc.h:
+
+../Core/Inc/position_sensor.h:
+
+../Core/Inc/spi.h:
+
+../Core/Inc/main.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
+
+../Core/Inc/stm32f4xx_hal_conf.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:
 
@@ -51,14 +66,6 @@ Core/Src/FlashWriter.o: ../Core/Src/FlashWriter.cpp \
 ../Drivers/CMSIS/Include/mpu_armv7.h:
 
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/system_stm32f4xx.h:
-
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
-
-../Core/Inc/stm32f4xx_hal_conf.h:
-
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
-
-../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
 
@@ -100,6 +107,14 @@ Core/Src/FlashWriter.o: ../Core/Src/FlashWriter.cpp \
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
 
-../Core/Inc/FlashWriter.h:
+../Core/Inc/adc.h:
 
-../Core/Inc/stm32f4xx_flash.h:
+../Core/Inc/tim.h:
+
+../Core/Inc/position_sensor.h:
+
+../Core/Inc/math_ops.h:
+
+../Core/Inc/hw_config.h:
+
+../Core/Inc/user_config.h:

@@ -7,13 +7,14 @@
 #define TIM_CH_U		TIM_CHANNEL_1		// Terminal U timer channel
 #define TIM_CH_V		TIM_CHANNEL_2		// Terminal V timer channel
 #define TIM_CH_W		TIM_CHANNEL_3		// Terminal W timer channel
-#define INVERT_DTC		1					// PWM inverting (1) or non-inverting (0)
+#define INVERT_DTC		0					// PWM inverting (1) or non-inverting (0)
 
 /* ADC */
+
 #define ADC_CH_MAIN		hadc1				// ADC channel handle which drives simultaneous mode
-#define ADC_CH_IA		0					// Phase A current sense ADC channel handle.  0 = unused
-#define ADC_CH_IB		hadc1				// Phase B current sense ADC channel handle.  0 = unused
-#define ADC_CH_IC		hadc2				// Phase C current sense ADC channel handle.  0 = unused
+#define ADC_CH_IA		hadc1					// Phase A current sense ADC channel handle.  0 = unused
+#define ADC_CH_IB		hadc2				// Phase B current sense ADC channel handle.  0 = unused
+#define ADC_CH_IC		0				// Phase C current sense ADC channel handle.  0 = unused
 #define ADC_CH_VBUS		hadc3				// Bus voltage ADC channel handle.  0 = unused
 
 /* DRV Gate drive */
@@ -41,11 +42,11 @@
 #define DTC_COMP 			0.000f          // deadtime compensation (100 ns / 25 us)
 #define DT					.000025f		// Loop period
 #define GR					1.0f			// Gear ratio (move this later)
-#define KT_OUT				.044f			// Torque constant
-#define EN_ENC_LINEARIZATION 0				// Enable/disable encoder linearization
+#define KT					.027f			// Torque constant
+#define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
 
 
-// Current controller///
+/* Current controller */
 #define K_D .05f                    // Loop gain,  Volts/Amp
 #define K_Q .05f                    // Loop gain,  Volts/Amp
 #define K_SCALE 0.0001f             // K_loop/Loop BW (Hz) 0.0042

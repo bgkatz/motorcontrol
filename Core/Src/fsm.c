@@ -40,12 +40,16 @@
 			 order_phases(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
 		 }
 		 else if(!comm_encoder_cal.done_cal){
-			 calibrate_encoder(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count, error_array, lut_array);
+			 calibrate_encoder(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
 		 }
 		 else{
 			 /* Exit calibration mode when done */
 			 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
 			 printf("E_ZERO: %d  %f\r\n", E_ZERO, 2.0f*PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
+			 E_ZERO = comm_encoder_cal.ezero;
+			 memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
+			 memcpy(&ENCODER_LUT, comm_encoder_cal.lut_arr, sizeof(comm_encoder_cal.lut_arr));
+			 //for(int i = 0; i<128; i++){printf("%d\r\n", ENCODER_LUT[i]);}
 			 if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
 			 preference_writer_flush(&prefs);
 			 preference_writer_close(&prefs);
@@ -64,10 +68,9 @@
 		 //controller.t_ff = 0;
 		 //controller.v_des = 2;
 		 //controller.p_des = 0;
-		 //
-		 //torque_control(&controller);
+		 torque_control(&controller);
 		 //field_weaken(&controller);
-		 controller.i_q_ref = 1.0f;
+		 //controller.i_q_des = 1.0f;
 		 commutate(&controller, &observer, &comm_encoder);
 
 		 break;
@@ -91,24 +94,24 @@
 
 		switch(fsmstate->state){
 		case MENU_MODE:
-			printf("Entering Main Menu\r\n");
+			//printf("Entering Main Menu\r\n");
 			enter_menu_state();
 			break;
 		case SETUP_MODE:
-			printf("Entering Setup\r\n");
+			//printf("Entering Setup\r\n");
 			enter_setup_state();
 			break;
 		case ENCODER_MODE:
-			printf("Entering Encoder Mode\r\n");
+			//printf("Entering Encoder Mode\r\n");
 			break;
 		case MOTOR_MODE:
-			printf("Entering Motor Mode\r\n");
+			//printf("Entering Motor Mode\r\n");
 			HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
 			reset_foc(&controller);
 			drv_enable_gd(drv);
 			break;
 		case CALIBRATION_MODE:
-			printf("Entering Calibration Mode\r\n");
+			//printf("Entering Calibration Mode\r\n");
 			/* zero out all calibrations before starting */
 
 			comm_encoder_cal.done_cal = 0;
@@ -128,15 +131,15 @@
 
 		switch(fsmstate->state){
 		case MENU_MODE:
-			printf("Leaving Main Menu\r\n");
+			//printf("Leaving Main Menu\r\n");
 			fsmstate->ready = 1;
 			break;
 		case SETUP_MODE:
-			printf("Leaving Setup Menu\r\n");
+			//printf("Leaving Setup Menu\r\n");
 			fsmstate->ready = 1;
 			break;
 		case ENCODER_MODE:
-			printf("Leaving Encoder Mode\r\n");
+			//printf("Leaving Encoder Mode\r\n");
 			fsmstate->ready = 1;
 			break;
 		case MOTOR_MODE:
@@ -145,16 +148,16 @@
 				fsmstate->ready = 1;
 				drv_disable_gd(drv);
 				reset_foc(&controller);
-				printf("Leaving Motor Mode\r\n");
+				//printf("Leaving Motor Mode\r\n");
 				HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
 			}
 			zero_commands(&controller);		// Set commands to zero
 			break;
 		case CALIBRATION_MODE:
-			printf("Exiting Calibration Mode\r\n");
+			//printf("Exiting Calibration Mode\r\n");
 			drv_disable_gd(drv);
-			free(error_array);
-			free(lut_array);
+			//free(error_array);
+			//free(lut_array);
 
 			fsmstate->ready = 1;
 			break;
