@@ -44,7 +44,7 @@
 			 else{
 				 /* Exit calibration mode when done */
 				 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
-				 printf("E_ZERO: %d  %f\r\n", E_ZERO, 2.0f*PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
+				 printf("E_ZERO: %d  %f\r\n", E_ZERO, TWO_PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
 				 E_ZERO = comm_encoder_cal.ezero;
 				 memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
 				 memcpy(&ENCODER_LUT, comm_encoder_cal.lut_arr, sizeof(comm_encoder_cal.lut_arr));
@@ -67,7 +67,7 @@
 			 else{
 				 //torque_control(&controller);
 				 //field_weaken(&controller);
-				 controller.i_q_des = 0;
+				 controller.i_q_des = 1;
 				 controller.i_d_des = 0;
 				 commutate(&controller, &comm_encoder);
 			 }

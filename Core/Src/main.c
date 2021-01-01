@@ -258,8 +258,8 @@ int main(void)
 	  HAL_Delay(10);
 	  drv_print_faults(drv);
 
-	  if(state.state == MOTOR_MODE){
-		  printf("%.3f  %.3f  %.3f  %.3f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
+	  if(state.state == CALIBRATION_MODE){
+		  //printf("%.3f  %.3f %.3f\r\n", controller.i_q_filt, controller.i_d_filt, controller.theta_elec);
 	  }
     /* USER CODE END WHILE */
 

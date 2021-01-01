@@ -250,8 +250,6 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 		float v_max = OVERMODULATION*controller->v_bus*(DTC_MAX-DTC_MIN);
 
        /// Commutation Loop ///
-       controller->loop_count ++;
-
        if((fabsf(controller->i_b) > 41.0f)|(fabsf(controller->i_c) > 41.0f)|(fabsf(controller->i_a) > 41.0f)){controller->oc_flag = 1;}
 
        dq0(controller->theta_elec, controller->i_a, controller->i_b, controller->i_c, &controller->i_d, &controller->i_q);    //dq0 transform on currents
@@ -297,9 +295,6 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        controller->v_q = controller->k_q*i_q_error + controller->q_int;// + v_q_ff;
        controller->v_ref = sqrt(controller->v_d*controller->v_d + controller->v_q*controller->v_q);
        controller->v_q = fmaxf(fminf(controller->v_q, vq_max), -vq_max);
-
-       controller->v_q = 1.0f;
-       controller->v_d = 0.0f;
 
        abc(controller->theta_elec + 0.0f*1.5f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation

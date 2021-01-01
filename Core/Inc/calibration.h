@@ -12,7 +12,7 @@
 #include "foc.h"
 
 #define V_CAL 	1.0f							// Calibration voltage
-#define I_CAL	2.0f
+#define I_CAL	5.0f
 #define W_CAL 	10.0f							// Calibration speed in rad/s
 #define T1		1.0f							// Cal settling period
 #define PPAIRS_MAX 64
@@ -34,7 +34,7 @@ typedef struct{
 	float next_sample_time;							// time to take next sample
 	int error_arr[N_CAL];
 	int lut_arr[N_LUT];
-	EncoderStruct cal_position;						// Positin reference used for calibration
+	EncoderStruct cal_position;						// Position reference used for calibration
 
 } CalStruct;
 
