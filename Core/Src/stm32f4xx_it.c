@@ -31,6 +31,7 @@
 #include "gpio.h"
 #include "adc.h"
 #include "foc.h"
+#include "can.h"
 #include "position_sensor.h"
 #include "hw_config.h"
 /* USER CODE END Includes */
@@ -219,7 +220,10 @@ void CAN1_RX0_IRQHandler(void)
   /* USER CODE END CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
-//HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.header, &r);
+  HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, &can_rx.data);
+  printf("Got some CAN:  ");
+  for(int i = 0; i<6; i++){printf("%d ", can_rx.data[i]);}
+  printf("\r\n");
   /* USER CODE END CAN1_RX0_IRQn 1 */
 }
 

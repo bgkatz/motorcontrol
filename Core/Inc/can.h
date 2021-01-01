@@ -50,16 +50,20 @@ void MX_CAN1_Init(void);
 /* USER CODE BEGIN Prototypes */
 typedef struct{
 	uint8_t id;
-	uint8_t len;
-	uint8_t data[8];
-	CAN_TxHeaderTypeDef tx_header;
+	uint8_t data[6];
 	CAN_RxHeaderTypeDef rx_header;
 	CAN_FilterTypeDef filter;
-}CANMessage ;
+}CANRxMessage ;
 
-void can_rx_init(CANMessage *msg);
-void pack_reply(CANMessage *msg, uint8_t id, float p, float v, float t);
-void unpack_cmd(CANMessage msg);
+typedef struct{
+	uint8_t id;
+	uint8_t data[8];
+	CAN_TxHeaderTypeDef tx_header;
+}CANTxMessage ;
+
+void can_rx_init(CANRxMessage *msg);
+void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t);
+void unpack_cmd(CANRxMessage msg);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

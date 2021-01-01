@@ -89,8 +89,8 @@ FSMStruct state;
 EncoderStruct comm_encoder;
 DRVStruct drv;
 CalStruct comm_encoder_cal;
-CANMessage can_tx;
-CANMessage can_rx;
+CANTxMessage can_tx;
+CANRxMessage can_rx;
 
 /* init but don't allocate calibration arrays */
 int *error_array = NULL;
@@ -191,7 +191,7 @@ int main(void)
 
   if(EN_ENC_LINEARIZATION){memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));}	// Copy the linearization lookup table
   else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
-  for(int i = 0; i<128; i++){printf("%d\r\n", comm_encoder.offset_lut[i]);}
+  //for(int i = 0; i<128; i++){printf("%d\r\n", comm_encoder.offset_lut[i]);}
 
   /* Turn on ADCs */
   HAL_ADC_Start(&hadc1);
@@ -225,8 +225,6 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
 
   /* CAN setup */
-  can_tx.len = 6;
-  can_rx.len = 8;
   can_rx_init(&can_rx);
 
   /* Start the FSM */
@@ -240,10 +238,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim1);
 
   CAN_TxHeaderTypeDef pHeader; //declare a specific header for message transmissions
-  CAN_RxHeaderTypeDef pRxHeader; //declare header for message reception
   uint32_t TxMailbox;
-  uint8_t a[2];
-  uint8_t r[2];
 
 	pHeader.DLC=1; //give message size of 1 byte
 	pHeader.IDE=CAN_ID_STD; //set identifier to standard
@@ -257,6 +252,7 @@ int main(void)
 	pRxHeader.StdId = 1;
 */
 	HAL_CAN_Start(&CAN_H); //start CAN
+	__HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING);
 
 
   /* USER CODE END 2 */
@@ -270,25 +266,9 @@ int main(void)
 
 	  HAL_Delay(100);
 
-	  HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &can_rx.rx_header, &can_rx.data);
-
-	  for(int i = 0; i<8; i++){printf("%d ", can_rx.data[i]);}
-	  printf("\r\n");
-
-	  //printf("%f\r\n", controller.v_bus);
-	  //printf("%d\r\n", controller.adc_vbus_raw);
 	  //printf("%f  %f  %f %f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
 	  //printf("%d  %d  %d  %d\r\n", controller.adc_a_raw, controller.adc_b_raw, controller.adc_vbus_raw, controller.adc_p_raw);
 	  drv_print_faults(drv);
-	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_SET );
-	  //HAL_Delay(100);
-	  //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_5, GPIO_PIN_RESET );
-	  //printf("hello\r\n");
-	  //printf("%f  %f  %f\r\n", comm_encoder.angle_multiturn[0], comm_encoder.velocity, comm_encoder.vel2);
-	  //ps_sample(&comm_encoder, .000025f);
-	  //for(int i = 0; i<N_POS_SAMPLES; i++){ printf(" %.2f", comm_encoder.angle_multiturn[i]);}
-	  //printf("\r\n");
-
 
 	  if(state.state == MOTOR_MODE){
 		  //printf("%.3f  %.3f  %.3f  %.3f\r\n", controller.pressure_des, controller.pressure_filt, controller.pressure_int, controller.v_des);
@@ -296,7 +276,6 @@ int main(void)
 		  //printf("%d  %d\r\n", comm_encoder.raw, comm_encoder.raw-comm_encoder.count);
 	  }
 
-	  //printf("Main Loop Serial: %d", Serial2RxBuffer[1]);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -23,6 +23,7 @@
 /* USER CODE BEGIN 0 */
 #include "hw_config.h"
 #include "user_config.h"
+#include "math_ops.h"
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan1;
@@ -110,7 +111,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
 /* USER CODE BEGIN 1 */
 
-void can_rx_init(CANMessage *msg){
+void can_rx_init(CANRxMessage *msg){
 	msg->filter.FilterFIFOAssignment=CAN_FILTER_FIFO0; //set fifo assignment
 	msg->filter.FilterIdHigh=CAN_ID<<5; //the ID that the filter looks for (switch this for the other microcontroller)
 	msg->filter.FilterIdLow=0x0;
@@ -133,7 +134,7 @@ void can_rx_init(CANMessage *msg){
 /// 2: [velocity[11-4]]
 /// 3: [velocity[3-0], current[11-8]]
 /// 4: [current[7-0]]
-void pack_reply(CANMessage *msg, uint8_t id, float p, float v, float t){
+void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t){
     int p_int = float_to_uint(p, P_MIN, P_MAX, 16);
     int v_int = float_to_uint(v, V_MIN, V_MAX, 12);
     int t_int = float_to_uint(t, -T_MAX, T_MAX, 12);
@@ -161,7 +162,7 @@ void pack_reply(CANMessage *msg, uint8_t id, float p, float v, float t){
 /// 5: [kd[11-4]]
 /// 6: [kd[3-0], torque[11-8]]
 /// 7: [torque[7-0]]
-void unpack_cmd(CANMessage msg){// ControllerStruct * controller){
+void unpack_cmd(CANRxMessage msg){// ControllerStruct * controller){
         int p_int = (msg.data[0]<<8)|msg.data[1];
         int v_int = (msg.data[2]<<4)|(msg.data[3]>>4);
         int kp_int = ((msg.data[3]&0xF)<<8)|msg.data[4];
