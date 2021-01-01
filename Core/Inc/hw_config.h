@@ -9,6 +9,10 @@
 #define TIM_CH_W		TIM_CHANNEL_3		// Terminal W timer channel
 #define INVERT_DTC		0					// PWM inverting (1) or non-inverting (0)
 
+/* ISRs */
+#define PWM_ISR			TIM1_UP_TIM10_IRQn	// PWM Timer ISR
+#define CAN_ISR			CAN1_RX0_IRQn		// CAN Receive ISR
+
 /* ADC */
 
 #define ADC_CH_MAIN		hadc1				// ADC channel handle which drives simultaneous mode

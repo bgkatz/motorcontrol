@@ -230,6 +230,10 @@ int main(void)
   HAL_CAN_Start(&CAN_H); //start CAN
   __HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING);
 
+  /* Set Interrupt Priorities */
+  NVIC_SetPriority(PWM_ISR, 1);                                             // commutation > communication
+  NVIC_SetPriority(CAN_ISR, 2);
+
   /* Start the FSM */
   state.state = MENU_MODE;
   state.next_state = MENU_MODE;
