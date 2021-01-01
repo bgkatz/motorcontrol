@@ -33,8 +33,8 @@ Core/Src/calibration.o: ../Core/Src/calibration.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/user_config.h ../Core/Inc/foc.h ../Core/Inc/hw_config.h \
- ../Core/Inc/user_config.h ../Core/Inc/usart.h ../Core/Inc/math_ops.h
+ ../Core/Inc/foc.h ../Core/Inc/hw_config.h ../Core/Inc/user_config.h \
+ ../Core/Inc/usart.h ../Core/Inc/math_ops.h
 
 ../Core/Inc/calibration.h:
 
@@ -107,8 +107,6 @@ Core/Src/calibration.o: ../Core/Src/calibration.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-
-../Core/Inc/user_config.h:
 
 ../Core/Inc/foc.h:
 

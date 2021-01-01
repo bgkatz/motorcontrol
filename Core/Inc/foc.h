@@ -33,7 +33,12 @@ typedef struct{
     int mode;
     int ovp_flag;                                           // Over-voltage flag
     int oc_flag;											// Over-current flag
-    float p_des, v_des, kp, kd, t_ff;                       // Desired position, velocity, gains, torque
+    union{
+    	float commands[5];									// Making this easier to pass around without including foc.h everywhere
+    	struct{
+    		float p_des, v_des, kp, kd, t_ff;                   // Desired position, velocity, gains, torque
+    	}
+    };
     float v_ref, fw_int;                                    // output voltage magnitude, field-weakening integral
     int otw_flag;                                           // Over-temp warning
     float i_max;											// Maximum current

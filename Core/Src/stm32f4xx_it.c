@@ -34,6 +34,7 @@
 #include "can.h"
 #include "position_sensor.h"
 #include "hw_config.h"
+#include "user_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -220,9 +221,14 @@ void CAN1_RX0_IRQHandler(void)
   /* USER CODE END CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
-  HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, &can_rx.data);
+  HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
+  uint32_t TxMailbox;
+  pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q*KT*GR);	// Pack response
+  HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
+  unpack_cmd(can_rx, controller.commands);	// Unpack commands
+
   printf("Got some CAN:  ");
-  for(int i = 0; i<6; i++){printf("%d ", can_rx.data[i]);}
+  for(int i = 0; i<5; i++){printf("%f ", controller.commands[i]);}
   printf("\r\n");
   /* USER CODE END CAN1_RX0_IRQn 1 */
 }

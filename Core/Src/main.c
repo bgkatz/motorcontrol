@@ -226,6 +226,9 @@ int main(void)
 
   /* CAN setup */
   can_rx_init(&can_rx);
+  can_tx_init(&can_tx);
+  HAL_CAN_Start(&CAN_H); //start CAN
+  __HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING);
 
   /* Start the FSM */
   state.state = MENU_MODE;
@@ -237,27 +240,8 @@ int main(void)
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
   HAL_TIM_Base_Start_IT(&htim1);
 
-  CAN_TxHeaderTypeDef pHeader; //declare a specific header for message transmissions
-  uint32_t TxMailbox;
-
-	pHeader.DLC=1; //give message size of 1 byte
-	pHeader.IDE=CAN_ID_STD; //set identifier to standard
-	pHeader.RTR=CAN_RTR_DATA; //set data type to remote transmission request?
-	pHeader.StdId=0; //define a standard identifier, used for message identification by filters (switch this for the other microcontroller)
-
-/*
-	pRxHeader.DLC = 2;
-	pRxHeader.IDE = CAN_ID_STD;
-	pRxHeader.RTR = CAN_RTR_DATA;
-	pRxHeader.StdId = 1;
-*/
-	HAL_CAN_Start(&CAN_H); //start CAN
-	__HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING);
-
-
   /* USER CODE END 2 */
- 
- 
+
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */

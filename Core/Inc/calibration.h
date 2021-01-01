@@ -11,8 +11,8 @@
 #include "position_sensor.h"
 #include "foc.h"
 
-#define V_CAL 	3.0f							// Calibration voltage
-#define W_CAL 	20.0f							// Calibration speed in rad/s
+#define V_CAL 	1.0f							// Calibration voltage
+#define W_CAL 	10.0f							// Calibration speed in rad/s
 #define T1		1.0f							// Cal settling period
 #define PPAIRS_MAX 64
 #define SAMPLES_PER_PPAIR N_LUT
