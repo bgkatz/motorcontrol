@@ -106,9 +106,7 @@ void svm(float v_bus, float u, float v, float w, float *dtc_u, float *dtc_v, flo
      u,v,w amplitude = v_bus for full modulation depth */
 
     float v_offset = (fminf3(u, v, w) + fmaxf3(u, v, w))*0.5f;
-
     float v_midpoint = .5f*(DTC_MAX+DTC_MIN);
-
 
     *dtc_u = fminf(fmaxf((.5f*(u -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + v_midpoint ), DTC_MIN), DTC_MAX);
     *dtc_v = fminf(fmaxf((.5f*(v -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + v_midpoint ), DTC_MIN), DTC_MAX);
@@ -129,11 +127,8 @@ void zero_current(ControllerStruct *controller){
 
     for (int i = 0; i<n; i++){               // Average n samples
     	analog_sample(controller);
-    	//HAL_ADC_Start(&ADC_CH_MAIN);
-    	//HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
-    	adc_a_offset +=  controller->adc_a_raw;//HAL_ADC_GetValue(&ADC_CH_IB);
-    	adc_b_offset += controller->adc_b_raw;//HAL_ADC_GetValue(&ADC_CH_IC);
-    	//HAL_ADC_GetValue(&ADC_CH_VBUS);
+    	adc_a_offset +=  controller->adc_a_raw;
+    	adc_b_offset += controller->adc_b_raw;
      }
     controller->adc_a_offset = adc_a_offset/n;
     controller->adc_b_offset = adc_b_offset/n;
@@ -146,8 +141,8 @@ void init_controller_params(ControllerStruct *controller){
     controller->ki_q = KI_Q;
     controller->k_d = K_SCALE*I_BW;
     controller->k_q = K_SCALE*I_BW;
-    controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*2.0f*PI_F);
-    for(int i = 0; i<128; i++)
+    controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*TWO_PI_F);
+    for(int i = 0; i<128; i++)	// Approximate duty cycle linearization
     {
         controller->inverter_tab[i] = 1.0f + 1.2f*exp(-0.0078125f*i/.032f);
     }
@@ -243,9 +238,9 @@ void field_weaken(ControllerStruct *controller)
        //float i_cmd_mag_sq = controller->i_d_des*controller->i_d_des + controller->i_q_des*controller->i_q_des;
 
 }
-void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderStruct *encoder)
+void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 {
-	/* Do Field Oriented Controll and stuff */
+	/* Do Field Oriented Control and stuff */
 
 		controller->theta_elec = encoder->elec_angle;
 		controller->dtheta_elec = encoder->elec_velocity;
@@ -303,38 +298,11 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderSt
        controller->v_ref = sqrt(controller->v_d*controller->v_d + controller->v_q*controller->v_q);
        controller->v_q = fmaxf(fminf(controller->v_q, vq_max), -vq_max);
 
-       //limit_norm(&controller->d_int, &controller->q_int, OVERMODULATION*controller->v_bus);
+       controller->v_q = 1.0f;
+       controller->v_d = 0.0f;
 
-
-       //controller->v_q = 0.0f;
-       //controller->v_d = 1.0f*controller->v_bus;
-
-
-
-       //limit_norm(&controller->v_d, &controller->v_q, v_max);       // Normalize voltage vector to lie within circle of radius v_bus
-       //float dtc = controller->v_ref/controller->v_bus;
-       float scale = 1;//linearize_dtc(controller, dtc);
-
-       //controller->v_d = scale*controller->v_d;
-       //controller->v_q = scale*controller->v_q;
-       //float dtc_q = controller->v_q/controller->v_bus;
-
-       //linearize_dtc(&dtc_q);
-       //controller->v_d = dtc_d*controller->v_bus;
-       //controller->v_q = dtc_q*controller->v_bus;
-
-       //controller->v_d = 0.0f;
-       //controller->v_q = 1.0f;
-
-       abc(controller->theta_elec + 1.5f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-       //controller->v_u = 0.0f;
-       //controller->v_v = 2.0f;
-       //controller->v_w = 0.0f;
+       abc(controller->theta_elec + 0.0f*1.5f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-
-       //controller->dtc_u = .1f;
-       //controller->dtc_v = .1f;
-       //controller->dtc_w = .1f;
 
        set_dtc(controller);
 

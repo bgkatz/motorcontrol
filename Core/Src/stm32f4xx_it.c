@@ -221,11 +221,26 @@ void CAN1_RX0_IRQHandler(void)
   /* USER CODE END CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan1);
   /* USER CODE BEGIN CAN1_RX0_IRQn 1 */
+
   HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
   uint32_t TxMailbox;
   pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q*KT*GR);	// Pack response
   HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
-  unpack_cmd(can_rx, controller.commands);	// Unpack commands
+
+  /* Check for special Commands */
+  if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) & (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFC))){
+	  update_fsm(&state, MOTOR_CMD);
+      }
+  else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFD))){
+      update_fsm(&state, MENU_CMD);
+      }
+  else if(((can_rx.data[0]==0xFF) & (can_rx.data[1]==0xFF) & (can_rx.data[2]==0xFF) & (can_rx.data[3]==0xFF) * (can_rx.data[4]==0xFF) & (can_rx.data[5]==0xFF) & (can_rx.data[6]==0xFF) & (can_rx.data[7]==0xFE))){
+	  update_fsm(&state, ZERO_CMD);
+      }
+  else{
+	  unpack_cmd(can_rx, controller.commands);	// Unpack commands
+	  controller.timeout = 0;					// Reset timeout counter
+  }
 
   printf("Got some CAN:  ");
   for(int i = 0; i<5; i++){printf("%f ", controller.commands[i]);}
@@ -242,17 +257,12 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
 	/* Sample ADCs */
 	analog_sample(&controller);
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
 	/* Sample position sensor */
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
 	ps_sample(&comm_encoder, DT);
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
-	/* run Finite State Machine */
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
+	/* Run Finite State Machine */
 	run_fsm(&state);
-	//HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_RESET );
 
 	/* increment loop count */
 	controller.loop_count++;

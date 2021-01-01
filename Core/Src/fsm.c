@@ -31,59 +31,58 @@
 	 }
 
 	 switch(fsmstate->state){
+		 case MENU_MODE:
+			 break;
 
-	 case MENU_MODE:
-		 break;
+		 case CALIBRATION_MODE:
+			 if(!comm_encoder_cal.done_ordering){
+				 order_phases(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
+			 }
+			 else if(!comm_encoder_cal.done_cal){
+				 calibrate_encoder(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
+			 }
+			 else{
+				 /* Exit calibration mode when done */
+				 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
+				 printf("E_ZERO: %d  %f\r\n", E_ZERO, 2.0f*PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
+				 E_ZERO = comm_encoder_cal.ezero;
+				 memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
+				 memcpy(&ENCODER_LUT, comm_encoder_cal.lut_arr, sizeof(comm_encoder_cal.lut_arr));
+				 //for(int i = 0; i<128; i++){printf("%d\r\n", ENCODER_LUT[i]);}
+				 if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+				 preference_writer_flush(&prefs);
+				 preference_writer_close(&prefs);
+				 preference_writer_load(prefs);
+				 update_fsm(fsmstate, 27);
+			 }
 
-	 case CALIBRATION_MODE:
-		 if(!comm_encoder_cal.done_ordering){
-			 order_phases(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
-		 }
-		 else if(!comm_encoder_cal.done_cal){
-			 calibrate_encoder(&comm_encoder, &controller, &comm_encoder_cal, controller.loop_count);
-		 }
-		 else{
-			 /* Exit calibration mode when done */
-			 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
-			 printf("E_ZERO: %d  %f\r\n", E_ZERO, 2.0f*PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
-			 E_ZERO = comm_encoder_cal.ezero;
-			 memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
-			 memcpy(&ENCODER_LUT, comm_encoder_cal.lut_arr, sizeof(comm_encoder_cal.lut_arr));
-			 //for(int i = 0; i<128; i++){printf("%d\r\n", ENCODER_LUT[i]);}
-			 if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
-			 preference_writer_flush(&prefs);
-			 preference_writer_close(&prefs);
-			 preference_writer_load(prefs);
+			 break;
 
-			 update_fsm(fsmstate, 27);
-		 }
+		 case MOTOR_MODE:
+			 /* If CAN has timed out, reset all commands */
+			 if((CAN_TIMEOUT > 0 ) && (controller.timeout > CAN_TIMEOUT)){
+				 zero_commands(&controller);
+			 }
+			 /* Otherwise, commutate */
+			 else{
+				 //torque_control(&controller);
+				 //field_weaken(&controller);
+				 controller.i_q_des = 0;
+				 controller.i_d_des = 0;
+				 commutate(&controller, &comm_encoder);
+			 }
+			 controller.timeout ++;
+			 break;
 
-		 break;
+		 case SETUP_MODE:
+			 break;
 
-	 case MOTOR_MODE:
+		 case ENCODER_MODE:
+			 ps_print(&comm_encoder, 100);
+			 break;
 
-		 // get latest commands
-		 //controller.kp = 0;
-		 //controller.kd = .02;
-		 //controller.t_ff = 0;
-		 //controller.v_des = 2;
-		 //controller.p_des = 0;
-		 torque_control(&controller);
-		 //field_weaken(&controller);
-		 //controller.i_q_des = 1.0f;
-		 commutate(&controller, &observer, &comm_encoder);
-
-		 break;
-
-	 case SETUP_MODE:
-		 break;
-
-	 case ENCODER_MODE:
-		 ps_print(&comm_encoder, 100);
-		 break;
-
-	 case INIT_TEMP_MODE:
-		 break;
+		 case INIT_TEMP_MODE:
+			 break;
 	 }
 
  }
@@ -93,34 +92,34 @@
 	  * Do necessary setup   */
 
 		switch(fsmstate->state){
-		case MENU_MODE:
-			//printf("Entering Main Menu\r\n");
-			enter_menu_state();
-			break;
-		case SETUP_MODE:
-			//printf("Entering Setup\r\n");
-			enter_setup_state();
-			break;
-		case ENCODER_MODE:
-			//printf("Entering Encoder Mode\r\n");
-			break;
-		case MOTOR_MODE:
-			//printf("Entering Motor Mode\r\n");
-			HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
-			reset_foc(&controller);
-			drv_enable_gd(drv);
-			break;
-		case CALIBRATION_MODE:
-			//printf("Entering Calibration Mode\r\n");
-			/* zero out all calibrations before starting */
+				case MENU_MODE:
+				//printf("Entering Main Menu\r\n");
+				enter_menu_state();
+				break;
+			case SETUP_MODE:
+				//printf("Entering Setup\r\n");
+				enter_setup_state();
+				break;
+			case ENCODER_MODE:
+				//printf("Entering Encoder Mode\r\n");
+				break;
+			case MOTOR_MODE:
+				//printf("Entering Motor Mode\r\n");
+				HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
+				reset_foc(&controller);
+				drv_enable_gd(drv);
+				break;
+			case CALIBRATION_MODE:
+				//printf("Entering Calibration Mode\r\n");
+				/* zero out all calibrations before starting */
 
-			comm_encoder_cal.done_cal = 0;
-			comm_encoder_cal.done_ordering = 0;
-			comm_encoder_cal.started = 0;
-			comm_encoder.e_zero = 0;
-			memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
-			drv_enable_gd(drv);
-			break;
+				comm_encoder_cal.done_cal = 0;
+				comm_encoder_cal.done_ordering = 0;
+				comm_encoder_cal.started = 0;
+				comm_encoder.e_zero = 0;
+				memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
+				drv_enable_gd(drv);
+				break;
 
 		}
  }
@@ -130,37 +129,37 @@
 	  * Do necessary cleanup  */
 
 		switch(fsmstate->state){
-		case MENU_MODE:
-			//printf("Leaving Main Menu\r\n");
-			fsmstate->ready = 1;
-			break;
-		case SETUP_MODE:
-			//printf("Leaving Setup Menu\r\n");
-			fsmstate->ready = 1;
-			break;
-		case ENCODER_MODE:
-			//printf("Leaving Encoder Mode\r\n");
-			fsmstate->ready = 1;
-			break;
-		case MOTOR_MODE:
-			/* Don't stop commutating if there are high currents or FW happening */
-			if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
+			case MENU_MODE:
+				//printf("Leaving Main Menu\r\n");
 				fsmstate->ready = 1;
+				break;
+			case SETUP_MODE:
+				//printf("Leaving Setup Menu\r\n");
+				fsmstate->ready = 1;
+				break;
+			case ENCODER_MODE:
+				//printf("Leaving Encoder Mode\r\n");
+				fsmstate->ready = 1;
+				break;
+			case MOTOR_MODE:
+				/* Don't stop commutating if there are high currents or FW happening */
+				if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
+					fsmstate->ready = 1;
+					drv_disable_gd(drv);
+					reset_foc(&controller);
+					//printf("Leaving Motor Mode\r\n");
+					HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
+				}
+				zero_commands(&controller);		// Set commands to zero
+				break;
+			case CALIBRATION_MODE:
+				//printf("Exiting Calibration Mode\r\n");
 				drv_disable_gd(drv);
-				reset_foc(&controller);
-				//printf("Leaving Motor Mode\r\n");
-				HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
-			}
-			zero_commands(&controller);		// Set commands to zero
-			break;
-		case CALIBRATION_MODE:
-			//printf("Exiting Calibration Mode\r\n");
-			drv_disable_gd(drv);
-			//free(error_array);
-			//free(lut_array);
+				//free(error_array);
+				//free(lut_array);
 
-			fsmstate->ready = 1;
-			break;
+				fsmstate->ready = 1;
+				break;
 		}
 
  }
@@ -169,63 +168,63 @@
 	 /*update_fsm is only run when new state-change information is received
 	  * on serial terminal input or CAN input
 	  */
-	if(fsm_input == 27){	// escape to exit do rest mode
+	if(fsm_input == MENU_CMD){	// escape to exit do rest mode
 		fsmstate->next_state = MENU_MODE;
 		fsmstate->ready = 0;
 		return;
 	}
 	switch(fsmstate->state){
-	case MENU_MODE:
-        switch (fsm_input){
-            case 'c':
-            	fsmstate->next_state = CALIBRATION_MODE;
-            	fsmstate->ready = 0;
-                break;
-            case 'm':
-            	fsmstate->next_state = MOTOR_MODE;
-            	fsmstate->ready = 0;
-                break;
-            case 'e':
-            	fsmstate->next_state = ENCODER_MODE;
-            	fsmstate->ready = 0;
-                break;
-            case 's':
-            	fsmstate->next_state = SETUP_MODE;
-            	fsmstate->ready = 0;
-                break;
-            case 'z':
-                //spi.SetMechOffset(0);
-                //spi.Sample(DT);
-                HAL_Delay(20);
-                //M_OFFSET = spi.GetMechPosition();
-                //if (!prefs.ready()) prefs.open();
-                //    prefs.flush();                                                  // Write new prefs to flash
-                //    prefs.close();
-                //    prefs.load();
-                //spi.SetMechOffset(M_OFFSET);
-                printf("\n\r  Saved new zero position:  %.4f\n\r\n\r", M_ZERO);
-                break;
-            }
-		break;
-	case SETUP_MODE:
-		if(fsm_input == 13){
-			process_user_input(fsmstate);
+		case MENU_MODE:
+			switch (fsm_input){
+				case CAL_CMD:
+					fsmstate->next_state = CALIBRATION_MODE;
+					fsmstate->ready = 0;
+					break;
+				case MOTOR_CMD:
+					fsmstate->next_state = MOTOR_MODE;
+					fsmstate->ready = 0;
+					break;
+				case ENCODER_CMD:
+					fsmstate->next_state = ENCODER_MODE;
+					fsmstate->ready = 0;
+					break;
+				case SETUP_CMD:
+					fsmstate->next_state = SETUP_MODE;
+					fsmstate->ready = 0;
+					break;
+				case ZERO_CMD:
+					comm_encoder.m_zero = 0;
+					ps_sample(&comm_encoder, DT);
+					HAL_Delay(20);
+					M_ZERO = comm_encoder.count;
+					//if (!prefs.ready()) prefs.open();
+					//    prefs.flush();                                                  // Write new prefs to flash
+					//    prefs.close();
+					//    prefs.load();
+					//spi.SetMechOffset(M_OFFSET);
+					printf("\n\r  Saved new zero position:  %.4f\n\r\n\r", M_ZERO);
+					break;
+				}
 			break;
-		}
-		if(fsmstate->bytecount == 0){fsmstate->cmd_id = fsm_input;}
-		else{
-			fsmstate->cmd_buff[fsmstate->bytecount-1] = fsm_input;
-			//fsmstate->bytecount = fsmstate->bytecount%(sizeof(fsmstate->cmd_buff)/sizeof(fsmstate->cmd_buff[0])); // reset when buffer is full
-		}
-		fsmstate->bytecount++;
-		/* If enter is typed, process user input */
+		case SETUP_MODE:
+			if(fsm_input == ENTER_CMD){
+				process_user_input(fsmstate);
+				break;
+			}
+			if(fsmstate->bytecount == 0){fsmstate->cmd_id = fsm_input;}
+			else{
+				fsmstate->cmd_buff[fsmstate->bytecount-1] = fsm_input;
+				//fsmstate->bytecount = fsmstate->bytecount%(sizeof(fsmstate->cmd_buff)/sizeof(fsmstate->cmd_buff[0])); // reset when buffer is full
+			}
+			fsmstate->bytecount++;
+			/* If enter is typed, process user input */
 
-		break;
+			break;
 
-	case ENCODER_MODE:
-		break;
-	case MOTOR_MODE:
-		break;
+		case ENCODER_MODE:
+			break;
+		case MOTOR_MODE:
+			break;
 	}
 	//printf("FSM State: %d  %d\r\n", fsmstate.state, fsmstate.state_change);
  }

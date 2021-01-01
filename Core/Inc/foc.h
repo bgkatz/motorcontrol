@@ -37,7 +37,7 @@ typedef struct{
     	float commands[5];									// Making this easier to pass around without including foc.h everywhere
     	struct{
     		float p_des, v_des, kp, kd, t_ff;                   // Desired position, velocity, gains, torque
-    	}
+    	};
     };
     float v_ref, fw_int;                                    // output voltage magnitude, field-weakening integral
     int otw_flag;                                           // Over-temp warning
@@ -65,7 +65,7 @@ void zero_current(ControllerStruct *controller);
 void reset_foc(ControllerStruct *controller);
 void reset_observer(ObserverStruct *observer);
 void init_controller_params(ControllerStruct *controller);
-void commutate(ControllerStruct *controller, ObserverStruct *observer, EncoderStruct *encoder);
+void commutate(ControllerStruct *controller, EncoderStruct *encoder);
 void torque_control(ControllerStruct *controller);
 void limit_current_ref (ControllerStruct *controller);
 void update_observer(ControllerStruct *controller, ObserverStruct *observer);

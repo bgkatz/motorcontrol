@@ -28,6 +28,10 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
     if(cal->time < T1){
         // Set voltage angle to zero, wait for rotor position to settle
         cal->theta_ref = 0;//W_CAL*cal->time;
+        //cal->cal_position.elec_angle = cal->theta_ref;
+        //controller->i_d_des = I_CAL;
+        //controller->i_q_des = 0.0f;
+        //commutate(controller, &cal->cal_position);
         controller->v_d = V_CAL;
         controller->v_q = 0.0f;
         abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
@@ -40,6 +44,10 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
     else if(cal->time < T1+2.0f*PI_F/W_CAL){
     	// rotate voltage vector through one electrical cycle
     	cal->theta_ref = W_CAL*(cal->time-T1);
+    	//cal->cal_position.elec_angle = cal->theta_ref;
+		//controller->i_d_des = I_CAL;
+		//controller->i_q_des = 0.0f;
+		//commutate(&controller, &cal->cal_position);
     	abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
     	svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
     	set_dtc(controller);

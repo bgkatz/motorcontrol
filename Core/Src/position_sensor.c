@@ -46,10 +46,10 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->count = encoder->raw + off_interp;
 
 	/* Real angles in radians */
-	encoder->angle_singleturn = 2.0f*PI_F*fmodf(((float)(encoder->count-M_ZERO))/((float)ENC_CPR), 1.0f);
-	encoder->angle_singleturn = encoder->angle_singleturn<0 ? encoder->angle_singleturn + 2.0f*PI_F : encoder->angle_singleturn;
-	encoder->elec_angle = 2.0f*PI_F*fmodf((encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR), 1.0f);
-	encoder->elec_angle = encoder->elec_angle<0 ? encoder->elec_angle + 2.0f*PI_F : encoder->elec_angle;
+	encoder->angle_singleturn = TWO_PI_F*fmodf(((float)(encoder->count-M_ZERO))/((float)ENC_CPR), 1.0f);
+	encoder->angle_singleturn = encoder->angle_singleturn<0 ? encoder->angle_singleturn + TWO_PI_F : encoder->angle_singleturn;
+	encoder->elec_angle = TWO_PI_F*fmodf((encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR), 1.0f);
+	encoder->elec_angle = encoder->elec_angle<0 ? encoder->elec_angle + TWO_PI_F : encoder->elec_angle;	// Add 2*pi to negative numbers
 
 	/* Rollover */
 	int count_diff = encoder->count - encoder->old_count;
@@ -57,7 +57,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	else if(count_diff < -ENC_CPR>>1){encoder->turns++;}
 
 	/* Multi-turn position */
-	encoder->angle_multiturn[0] = encoder->angle_singleturn + 2.0f*PI_F*(float)encoder->turns;
+	encoder->angle_multiturn[0] = encoder->angle_singleturn + TWO_PI_F*(float)encoder->turns;
 
 	/* Velocity */
 /*

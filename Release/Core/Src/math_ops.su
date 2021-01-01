@@ -1,6 +1,8 @@
-math_ops.c:15:7:fmaxf3	0	static
-math_ops.c:20:7:fminf3	0	static
-math_ops.c:31:6:limit_norm	24	static
-math_ops.c:40:6:limit	16	static
-math_ops.c:44:5:float_to_uint	0	static
-math_ops.c:52:7:uint_to_float	0	static
+math_ops.c:16:7:fmaxf3	0	static
+math_ops.c:21:7:fminf3	0	static
+math_ops.c:32:6:limit_norm	24	static
+math_ops.c:41:6:limit	16	static
+math_ops.c:45:5:float_to_uint	0	static
+math_ops.c:53:7:uint_to_float	0	static
+math_ops.c:60:7:sin_lut	16	static
+math_ops.c:66:7:cos_lut	0	static

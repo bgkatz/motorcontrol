@@ -46,7 +46,7 @@
 #define DTC_COMP 			0.000f          // deadtime compensation (100 ns / 25 us)
 #define DT					.000025f		// Loop period
 #define GR					1.0f			// Gear ratio (move this later)
-#define KT					.027f			// Torque constant
+#define KT					.075f			// Torque constant
 #define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
 
 

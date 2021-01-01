@@ -183,6 +183,9 @@ int main(void)
 
   init_controller_params(&controller);
 
+  /* calibration "encoder" zeroing */
+  memset(&comm_encoder_cal.cal_position, 0, sizeof(EncoderStruct));
+
   /* commutation encoder setup */
   comm_encoder.m_zero = M_ZERO;
   comm_encoder.e_zero = E_ZERO;
@@ -252,18 +255,12 @@ int main(void)
   while (1)
   {
 
-	  HAL_Delay(100);
-
-	  //printf("%f  %f  %f %f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
-	  //printf("%d  %d  %d  %d\r\n", controller.adc_a_raw, controller.adc_b_raw, controller.adc_vbus_raw, controller.adc_p_raw);
+	  HAL_Delay(10);
 	  drv_print_faults(drv);
 
 	  if(state.state == MOTOR_MODE){
-		  //printf("%.3f  %.3f  %.3f  %.3f\r\n", controller.pressure_des, controller.pressure_filt, controller.pressure_int, controller.v_des);
-		  //printf("%.3f  %.3f\r\n", controller.i_q_filt, comm_encoder.velocity);
-		  //printf("%d  %d\r\n", comm_encoder.raw, comm_encoder.raw-comm_encoder.count);
+		  printf("%.3f  %.3f  %.3f  %.3f\r\n", controller.i_a, controller.i_b, controller.i_c, controller.theta_elec);
 	  }
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
