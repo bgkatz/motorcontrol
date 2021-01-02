@@ -20,9 +20,10 @@ extern "C" {
 #define L_D						__float_reg[11]									// D-axis inductance
 #define L_Q						__float_reg[12]									// Q-axis inductance
 #define R_PHASE					__float_reg[13]									// Single phase resistance
-#define WB						__float_reg[14]									// Flux linkage (webers)
+#define KT						__float_reg[14]									// Torque Constant (N-m/A)
 #define R_TH					__float_reg[15]									// Thermal resistance (C/W)
 #define C_TH					__float_reg[16]									// Thermal mass (C/J)
+#define GR						__float_reg[17]									// Gear ratio
 
 
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration

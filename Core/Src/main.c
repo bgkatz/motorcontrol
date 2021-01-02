@@ -170,6 +170,8 @@ int main(void)
   if(isnan(TEMP_MAX) || TEMP_MAX==-1){TEMP_MAX = 125.0f;}
   if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
   if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
+  if(isnan(GR) || GR==-1){GR = 1.0f;}
+  if(isnan(KT) || KT==-1){KT = 1.0f;}
 
   printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
 
@@ -256,10 +258,8 @@ int main(void)
   {
 
 	  HAL_Delay(100);
-	  //drv_print_faults(drv);
-	  if (state.state==MOTOR_MODE){
-		  printf("%.3f\r\n", controller.dtheta_mech);
-	  }
+	  drv_print_faults(drv);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
