@@ -66,7 +66,6 @@
 			 /* Otherwise, commutate */
 			 else{
 				 //torque_control(&controller);
-				 controller.i_q_des = 2;
 				 field_weaken(&controller);
 				 commutate(&controller, &comm_encoder);
 			 }

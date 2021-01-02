@@ -16,7 +16,7 @@ typedef struct{
 	uint32_t tim_ch_w;								// Terminal W timer channel
     int adc_a_raw, adc_b_raw, adc_c_raw, adc_vbus_raw;      // Raw ADC Values
     float i_a, i_b, i_c;                                    // Phase currents
-    float v_bus;                                            // DC link voltage
+    float v_bus, v_bus_filt;                                // DC link voltage
     float theta_mech, theta_elec;                           // Rotor mechanical and electrical angle
     float dtheta_mech, dtheta_elec, dtheta_elec_filt;       // Rotor mechanical and electrical angular velocit
     float i_d, i_q, i_q_filt, i_d_filt;                     // D/Q currents
@@ -24,7 +24,7 @@ typedef struct{
     float v_d, v_q;                                         // D/Q voltages
     float dtc_u, dtc_v, dtc_w;                              // Terminal duty cycles
     float v_u, v_v, v_w;                                    // Terminal voltages
-    float k_d, k_q, ki_d, ki_q, alpha;                      // Current loop gains, current reference filter coefficient
+    float k_d, k_q, ki_d, ki_q, ki_fw, alpha;               // Current loop gains, current reference filter coefficient
     float d_int, q_int;                                     // Current error integrals
     int adc_a_offset, adc_b_offset, adc_c_offset, adc_vbus_offset; 		// ADC offsets
     float i_d_des, i_q_des, i_d_des_filt, i_q_des_filt;     // Current references

@@ -258,7 +258,7 @@ int main(void)
 	  HAL_Delay(100);
 	  //drv_print_faults(drv);
 	  if (state.state==MOTOR_MODE){
-		  printf("%.3f %.3f %.3f %.3f %.3f\r\n", controller.dtheta_elec,  controller.i_d_des, controller.i_d_filt, controller.v_d, controller.v_max);
+		  printf("%.3f\r\n", controller.dtheta_mech);
 	  }
     /* USER CODE END WHILE */
 

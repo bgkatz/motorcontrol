@@ -142,6 +142,7 @@ void init_controller_params(ControllerStruct *controller){
     controller->k_d = K_SCALE*I_BW;
     controller->k_q = K_SCALE*I_BW;
     controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*TWO_PI_F);
+    controller->ki_fw = .1f*controller->ki_d;
     for(int i = 0; i<128; i++)	// Approximate duty cycle linearization
     {
         controller->inverter_tab[i] = 1.0f + 1.2f*exp(-0.0078125f*i/.032f);
@@ -163,6 +164,7 @@ void reset_foc(ControllerStruct *controller){
     controller->d_int = 0;
     controller->v_q = 0;
     controller->v_d = 0;
+    controller->fw_int = 0;
     controller->otw_flag = 0;
 
     }
@@ -227,10 +229,8 @@ float linearize_dtc(ControllerStruct *controller, float dtc)
 
 void field_weaken(ControllerStruct *controller)
 {
-
        /// Field Weakening ///
-
-       controller->fw_int += .001f*(controller->v_max - controller->v_ref);
+       controller->fw_int += .005f*(controller->v_max - controller->v_ref);
        controller->fw_int = fmaxf(fminf(controller->fw_int, 0.0f), -I_FW_MAX);
        controller->i_d_des = controller->fw_int;
        float q_max = sqrtf(controller->i_max*controller->i_max - controller->i_d_des*controller->i_d_des);
@@ -247,7 +247,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 		controller->dtheta_mech = encoder->velocity*GR;
 		controller->theta_mech = encoder->angle_multiturn[0]/GR;
 
-		controller->v_max = OVERMODULATION*controller->v_bus*(DTC_MAX-DTC_MIN);
+		controller->v_max = OVERMODULATION*controller->v_bus_filt*(DTC_MAX-DTC_MIN);
 
        /// Commutation Loop ///
        if((fabsf(controller->i_b) > 41.0f)|(fabsf(controller->i_c) > 41.0f)|(fabsf(controller->i_a) > 41.0f)){controller->oc_flag = 1;}
@@ -256,6 +256,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 
        controller->i_q_filt = 0.99f*controller->i_q_filt + 0.01f*controller->i_q;
        controller->i_d_filt = 0.99f*controller->i_d_filt + 0.01f*controller->i_d;
+       controller->v_bus_filt = 0.9f*controller->v_bus_filt + .1f*controller->v_bus;
 
         controller->i_max = I_MAX;//I_MAX*(!controller->otw_flag) + I_MAX_CONT*controller->otw_flag;
 
@@ -277,10 +278,9 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        float i_q_error = controller->i_q_des - controller->i_q;
 
        // Calculate feed-forward voltages //
-       float v_d_ff = SQRT3*(0.0f*controller->i_d_des*0.0f  - controller->dtheta_elec*.003f*controller->i_q_des);   //feed-forward voltages
-       float v_q_ff =  SQRT3*(0.0f*controller->i_q_des*0.0f +  controller->dtheta_elec*(.003f*controller->i_d_des + 0.0f*0.0f));
+       //float v_d_ff = SQRT3*(0.0f*controller->i_d_des*0.0f  - controller->dtheta_elec*.003f*controller->i_q_des);   //feed-forward voltages
+       //float v_q_ff =  SQRT3*(0.0f*controller->i_q_des*0.0f +  controller->dtheta_elec*(.003f*controller->i_d_des + 0.0f*0.0f));
 
-       // Integrate Error //
 
        controller->v_d = controller->k_d*i_d_error + controller->d_int;// + v_d_ff;
        controller->v_d = fmaxf(fminf(controller->v_d, controller->v_max), -controller->v_max);
@@ -297,7 +297,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        controller->v_q = fmaxf(fminf(controller->v_q, vq_max), -vq_max);
 
        abc(controller->theta_elec + 1.5f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-       svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
+       svm(controller->v_bus_filt, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
        set_dtc(controller);
 
