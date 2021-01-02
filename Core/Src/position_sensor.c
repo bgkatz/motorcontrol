@@ -27,7 +27,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	 * after elapsed time dt */
 
 	/* Shift around previous samples */
-	encoder->old_count = encoder->count;
+	encoder->old_angle = encoder->angle_singleturn;
 	for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];}
 	//memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float)); // this is much slower for some reason
 
@@ -52,15 +52,20 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->elec_angle = encoder->elec_angle<0 ? encoder->elec_angle + TWO_PI_F : encoder->elec_angle;	// Add 2*pi to negative numbers
 
 	/* Rollover */
-	int count_diff = encoder->count - encoder->old_count;
-	if(count_diff > ENC_CPR>>1){encoder->turns--;}
-	else if(count_diff < -ENC_CPR>>1){encoder->turns++;}
+	float angle_diff = encoder->angle_singleturn - encoder->old_angle;
+	if(angle_diff > PI_F){encoder->turns--;}
+	else if(angle_diff < -PI_F){encoder->turns++;}
+	if(!encoder->first_sample){
+		encoder->turns = 0;
+		encoder->first_sample = 1;
+	}
 
 	/* Multi-turn position */
 	encoder->angle_multiturn[0] = encoder->angle_singleturn + TWO_PI_F*(float)encoder->turns;
 
 	/* Velocity */
-/*
+	/*
+	// Attempt at a moving least squares.  Wasn't any better
 		float m = (float)N_POS_SAMPLES;
 		float w = 1.0f/m;
 		float q = 12.0f/(m*m*m - m);
@@ -81,6 +86,7 @@ void ps_print(EncoderStruct * encoder, int dt_ms){
 	printf("   Linearized Count: %d", encoder->count);
 	printf("   Single Turn: %f", encoder->angle_singleturn);
 	printf("   Multiturn: %f", encoder->angle_multiturn[0]);
-	printf("   Electrical: %f\r\n", encoder->elec_angle);
+	printf("   Electrical: %f", encoder->elec_angle);
+	printf("   Turns:  %d\r\n", encoder->turns);
 	//HAL_Delay(dt_ms);
 }

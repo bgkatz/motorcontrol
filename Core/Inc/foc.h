@@ -39,7 +39,7 @@ typedef struct{
     		float p_des, v_des, kp, kd, t_ff;                   // Desired position, velocity, gains, torque
     	};
     };
-    float v_ref, fw_int;                                    // output voltage magnitude, field-weakening integral
+    float v_max, v_ref, fw_int;                                    // output voltage magnitude, field-weakening integral
     int otw_flag;                                           // Over-temp warning
     float i_max;											// Maximum current
     float inverter_tab[128];								// Inverter linearization table

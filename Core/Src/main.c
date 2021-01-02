@@ -231,11 +231,11 @@ int main(void)
   can_rx_init(&can_rx);
   can_tx_init(&can_tx);
   HAL_CAN_Start(&CAN_H); //start CAN
-  __HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING);
+  __HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING); // Start can interrupt
 
   /* Set Interrupt Priorities */
-  NVIC_SetPriority(PWM_ISR, 1);                                             // commutation > communication
-  NVIC_SetPriority(CAN_ISR, 2);
+  NVIC_SetPriority(PWM_ISR, 1); // commutation > communication
+  NVIC_SetPriority(CAN_ISR, 3);
 
   /* Start the FSM */
   state.state = MENU_MODE;
@@ -255,11 +255,10 @@ int main(void)
   while (1)
   {
 
-	  HAL_Delay(10);
-	  drv_print_faults(drv);
-
-	  if(state.state == CALIBRATION_MODE){
-		  //printf("%.3f  %.3f %.3f\r\n", controller.i_q_filt, controller.i_d_filt, controller.theta_elec);
+	  HAL_Delay(100);
+	  //drv_print_faults(drv);
+	  if (state.state==MOTOR_MODE){
+		  printf("%.3f %.3f %.3f %.3f %.3f\r\n", controller.dtheta_elec,  controller.i_d_des, controller.i_d_filt, controller.v_d, controller.v_max);
 	  }
     /* USER CODE END WHILE */
 

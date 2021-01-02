@@ -25,7 +25,7 @@ typedef struct{
 		uint8_t spi_rx_buff[2];
 		uint16_t spi_rx_word;
 	};
-	float angle_singleturn, angle_multiturn[N_POS_SAMPLES], elec_angle, velocity, elec_velocity, ppairs, vel2;
+	float angle_singleturn, old_angle, angle_multiturn[N_POS_SAMPLES], elec_angle, velocity, elec_velocity, ppairs, vel2;
 	float output_angle_multiturn;
 	int raw, count, old_count, turns;
 	int m_zero, e_zero;

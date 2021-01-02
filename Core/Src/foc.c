@@ -230,7 +230,7 @@ void field_weaken(ControllerStruct *controller)
 
        /// Field Weakening ///
 
-       controller->fw_int += .001f*(OVERMODULATION*controller->v_bus*(DTC_MAX-DTC_MIN) - controller->v_ref);
+       controller->fw_int += .001f*(controller->v_max - controller->v_ref);
        controller->fw_int = fmaxf(fminf(controller->fw_int, 0.0f), -I_FW_MAX);
        controller->i_d_des = controller->fw_int;
        float q_max = sqrtf(controller->i_max*controller->i_max - controller->i_d_des*controller->i_d_des);
@@ -247,7 +247,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 		controller->dtheta_mech = encoder->velocity*GR;
 		controller->theta_mech = encoder->angle_multiturn[0]/GR;
 
-		float v_max = OVERMODULATION*controller->v_bus*(DTC_MAX-DTC_MIN);
+		controller->v_max = OVERMODULATION*controller->v_bus*(DTC_MAX-DTC_MIN);
 
        /// Commutation Loop ///
        if((fabsf(controller->i_b) > 41.0f)|(fabsf(controller->i_c) > 41.0f)|(fabsf(controller->i_a) > 41.0f)){controller->oc_flag = 1;}
@@ -281,22 +281,22 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        float v_q_ff =  SQRT3*(0.0f*controller->i_q_des*0.0f +  controller->dtheta_elec*(.003f*controller->i_d_des + 0.0f*0.0f));
 
        // Integrate Error //
-       controller->d_int += controller->k_d*controller->ki_d*i_d_error;
 
-
-       controller->d_int = fmaxf(fminf(controller->d_int, v_max), -v_max);
        controller->v_d = controller->k_d*i_d_error + controller->d_int;// + v_d_ff;
-       controller->v_d = fmaxf(fminf(controller->v_d, v_max), -v_max);
-       float vq_max = sqrtf(v_max*v_max - controller->v_d*controller->v_d);
+       controller->v_d = fmaxf(fminf(controller->v_d, controller->v_max), -controller->v_max);
+       controller->d_int += controller->k_d*controller->ki_d*i_d_error;
+       controller->d_int = fmaxf(fminf(controller->d_int, controller->v_max), -controller->v_max);
+       float vq_max = sqrtf(controller->v_max*controller->v_max - controller->v_d*controller->v_d);
 
 
-       controller->q_int += controller->k_q*controller->ki_q*i_q_error;
-       controller->q_int = fmaxf(fminf(controller->q_int, v_max), -v_max);
+
        controller->v_q = controller->k_q*i_q_error + controller->q_int;// + v_q_ff;
-       controller->v_ref = sqrt(controller->v_d*controller->v_d + controller->v_q*controller->v_q);
+       controller->q_int += controller->k_q*controller->ki_q*i_q_error;
+       controller->q_int = fmaxf(fminf(controller->q_int, controller->v_max), -controller->v_max);
+       controller->v_ref = sqrtf(controller->v_d*controller->v_d + controller->v_q*controller->v_q);
        controller->v_q = fmaxf(fminf(controller->v_q, vq_max), -vq_max);
 
-       abc(controller->theta_elec + 0.0f*1.5f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
+       abc(controller->theta_elec + 1.5f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
        set_dtc(controller);

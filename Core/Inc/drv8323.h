@@ -25,7 +25,7 @@
 /// Drive Control Fields ///
 #define DIS_CPUV_EN         0x0     /// Charge pump UVLO fault
 #define DIS_CPUV_DIS        0x1
-#define DIS_GDF_EN          0x0     /// Gate drive fauilt
+#define DIS_GDF_EN          0x0     /// Gate drive fault
 #define DIS_GDF_DIS         0x1
 #define OTW_REP_EN          0x1     /// Over temp warning reported on nFAULT/FAULT bit
 #define OTW_REP_DIS         0x0

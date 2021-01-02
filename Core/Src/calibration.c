@@ -32,11 +32,6 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
         controller->i_d_des = I_CAL;
         controller->i_q_des = 0.0f;
         commutate(controller, &cal->cal_position);
-        //controller->v_d = V_CAL;
-        //controller->v_q = 0.0f;
-        //abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-        //svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-        //set_dtc(controller);
     	cal->theta_start = encoder->angle_multiturn[0];
     	return;
     }
@@ -46,22 +41,9 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
     	cal->theta_ref = W_CAL*(cal->time-T1);
     	cal->cal_position.elec_angle = cal->theta_ref;
 		commutate(controller, &cal->cal_position);
-    	//abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-    	//svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-    	//set_dtc(controller);
     	return;
     }
 
-    /*
-    controller->v_d = 0.0f;
-	controller->v_q = 0.0f;
-	abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-	svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-	set_dtc(controller);
- 	 */
-	//controller->i_d_des = 0.0f;
-	//controller->i_q_des = 0.0f;
-	//commutate(controller, &cal->cal_position);
 	reset_foc(controller);
 
 	float theta_end = encoder->angle_multiturn[0];
@@ -86,10 +68,7 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
 void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, int loop_count){
 	/* Calibrates e-zero and encoder nonliearity */
 
-
 	if(!cal->started){
-			//error_array = malloc(sizeof(int)*cal->ppairs*128);
-			//lut_array = malloc(sizeof(int)*cal->ppairs*128);
 			printf("Starting offset cal and linearization\r\n");
 			cal->started = 1;
 			cal->start_count = loop_count;
@@ -102,20 +81,10 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
     if(cal->time < T1){
         // Set voltage angle to zero, wait for rotor position to settle
         cal->theta_ref = 0;//W_CAL*cal->time;
-
-        //controller->v_d = V_CAL;
-        //controller->v_q = 0.0f;
-        //abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-        //svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-        //set_dtc(controller);
-
-
-
         cal->cal_position.elec_angle = cal->theta_ref;
         controller->i_d_des = I_CAL;
         controller->i_q_des = 0.0f;
         commutate(controller, &cal->cal_position);
-
 
     	cal->theta_start = encoder->angle_multiturn[0];
     	cal->next_sample_time = cal->time;
@@ -124,12 +93,6 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
     else if (cal->time < T1+2.0f*PI_F*PPAIRS/W_CAL){
     	// rotate voltage vector through one mechanical rotation in the positive direction
 		cal->theta_ref += W_CAL*DT;//(cal->time-T1);
-
-		//abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-		//svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-		//set_dtc(controller);
-
-
 		cal->cal_position.elec_angle = cal->theta_ref;
 		commutate(controller, &cal->cal_position);
 
@@ -151,11 +114,6 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 	else if (cal->time < T1+4.0f*PI_F*PPAIRS/W_CAL){
 		// rotate voltage vector through one mechanical rotation in the negative direction
 		cal->theta_ref -= W_CAL*DT;//(cal->time-T1);
-
-		//abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-		//svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-		//set_dtc(controller);
-
 		controller->i_d_des = I_CAL;
 		controller->i_q_des = 0.0f;
 		cal->cal_position.elec_angle = cal->theta_ref;
@@ -175,17 +133,6 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 		return;
     }
 
-
-    //controller->v_d = 0.0f;
-    //controller->v_q = 0.0f;
-    //abc(cal->theta_ref, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-    //svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
-    //set_dtc(controller);
-
-
-    //controller->i_d_des = 0.0f;
-    //controller->i_q_des = 0.0f;
-    //commutate(controller, &cal->cal_position);
     reset_foc(controller);
 
     // Calculate average offset
