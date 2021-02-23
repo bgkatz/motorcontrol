@@ -242,9 +242,6 @@ void CAN1_RX0_IRQHandler(void)
 	  controller.timeout = 0;					// Reset timeout counter
   }
 
-  printf("Got some CAN:  ");
-  for(int i = 0; i<5; i++){printf("%f ", controller.commands[i]);}
-  printf("\r\n");
   /* USER CODE END CAN1_RX0_IRQn 1 */
 }
 

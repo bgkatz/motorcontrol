@@ -65,7 +65,7 @@
 			 }
 			 /* Otherwise, commutate */
 			 else{
-				 //torque_control(&controller);
+				 torque_control(&controller);
 				 field_weaken(&controller);
 				 commutate(&controller, &comm_encoder);
 			 }
