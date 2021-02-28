@@ -254,8 +254,8 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        float i_q_error = controller->i_q_des - controller->i_q;
 
        // Calculate decoupling feed-forward voltages //
-       float v_d_ff = -controller->dtheta_elec*L_Q*controller->i_q;
-       float v_q_ff = controller->dtheta_elec*L_D*controller->i_d;
+       float v_d_ff = 0.0f;//-controller->dtheta_elec*L_Q*controller->i_q;
+       float v_q_ff = 0.0f;//controller->dtheta_elec*L_D*controller->i_d;
 
        controller->v_d = controller->k_d*i_d_error + controller->d_int + v_d_ff;
        controller->v_d = fmaxf(fminf(controller->v_d, controller->v_max), -controller->v_max);
