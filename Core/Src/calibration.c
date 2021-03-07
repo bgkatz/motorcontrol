@@ -17,6 +17,7 @@
 void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, int loop_count){
 	/* Checks phase order, to ensure that positive Q current produces
 	   torque in the positive direction wrt the position sensor */
+	PHASE_ORDER = 0;
 
 	if(!cal->started){
 		printf("Checking phase sign, pole pairs\r\n");
@@ -29,6 +30,7 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
         // Set voltage angle to zero, wait for rotor position to settle
         cal->theta_ref = 0;//W_CAL*cal->time;
         cal->cal_position.elec_angle = cal->theta_ref;
+        cal->cal_position.elec_velocity = 0;
         controller->i_d_des = I_CAL;
         controller->i_q_des = 0.0f;
         commutate(controller, &cal->cal_position);

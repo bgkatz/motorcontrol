@@ -1,8 +1,8 @@
-fsm.c:126:7:fsm_exit_state	16	static
-fsm.c:232:7:enter_menu_state	8	static
-fsm.c:248:7:enter_setup_state	40	static
-fsm.c:89:7:fsm_enter_state	8	static
+fsm.c:127:7:fsm_exit_state	16	static
+fsm.c:233:7:enter_menu_state	8	static
+fsm.c:249:7:enter_setup_state	40	static
+fsm.c:90:7:fsm_enter_state	8	static
 fsm.c:21:7:run_fsm	32	static
-fsm.c:269:7:process_user_input	24	static
-fsm.c:166:7:update_fsm	8	static
-fsm.c:337:7:enter_motor_mode	0	static
+fsm.c:270:7:process_user_input	24	static
+fsm.c:167:7:update_fsm	8	static
+fsm.c:338:7:enter_motor_mode	0	static

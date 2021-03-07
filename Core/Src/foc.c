@@ -261,13 +261,18 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        controller->v_d = fmaxf(fminf(controller->v_d, controller->v_max), -controller->v_max);
        controller->d_int += controller->k_d*controller->ki_d*i_d_error;
        controller->d_int = fmaxf(fminf(controller->d_int, controller->v_max), -controller->v_max);
-       float vq_max = sqrtf(controller->v_max*controller->v_max - controller->v_d*controller->v_d);
+       float vq_max = controller->v_max;//sqrtf(controller->v_max*controller->v_max - controller->v_d*controller->v_d);
 
        controller->v_q = controller->k_q*i_q_error + controller->q_int + v_q_ff;
        controller->q_int += controller->k_q*controller->ki_q*i_q_error;
        controller->q_int = fmaxf(fminf(controller->q_int, controller->v_max), -controller->v_max);
        controller->v_ref = sqrtf(controller->v_d*controller->v_d + controller->v_q*controller->v_q);
        controller->v_q = fmaxf(fminf(controller->v_q, vq_max), -vq_max);
+
+       limit_norm(&controller->v_d, &controller->v_q, controller->v_max);
+
+       controller->v_q = 2.0f;
+       controller->v_d = 0.0f;
 
        abc(controller->theta_elec + 1.5f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_max, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
