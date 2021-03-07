@@ -65,8 +65,9 @@
 			 }
 			 /* Otherwise, commutate */
 			 else{
-				 torque_control(&controller);
-				 field_weaken(&controller);
+				 //torque_control(&controller);
+				 //field_weaken(&controller);
+				 //controller.i_d_des = -5.0f;
 				 commutate(&controller, &comm_encoder);
 			 }
 			 controller.timeout ++;
@@ -256,6 +257,7 @@
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "f", "FW Current Limit (A)", "0.0", "33.0", I_FW_MAX);
 	    //printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "h", "Temp Cutoff (C) (0 = none)", "0", "150", TEMP_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "c", "Continuous Current (A)", "0", "40.0", I_MAX_CONT);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "a", "Calibration Current (A)", "0", "20.0", I_CAL);
 	    printf("\r\n CAN:\r\n");
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "i", "CAN ID", "0", "127", CAN_ID);
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "m", "CAN Master ID", "0", "127", CAN_MASTER);
@@ -299,6 +301,10 @@
 		 case 'c':
 			 I_MAX_CONT = fmaxf(fminf(atof(fsmstate->cmd_buff), 40.0f), 0.0f);
 			 printf("I_MAX_CONT set to %f\r\n", I_MAX_CONT);
+			 break;
+		 case 'a':
+			 I_CAL = fmaxf(fminf(atof(fsmstate->cmd_buff), 20.0f), 0.0f);
+			 printf("I_CAL set to %f\r\n", I_CAL);
 			 break;
 		 case 'g':
 			 GR = atof(fsmstate->cmd_buff);

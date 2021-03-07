@@ -24,6 +24,7 @@ extern "C" {
 #define R_TH					__float_reg[15]									// Thermal resistance (C/W)
 #define C_TH					__float_reg[16]									// Thermal mass (C/J)
 #define GR						__float_reg[17]									// Gear ratio
+#define I_CAL					__float_reg[18]									// Calibration Current
 
 
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration

@@ -169,6 +169,7 @@ int main(void)
   if(isnan(R_NOMINAL) || R_NOMINAL==-1){R_NOMINAL = 0.0f;}
   if(isnan(TEMP_MAX) || TEMP_MAX==-1){TEMP_MAX = 125.0f;}
   if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
+  if(isnan(I_CAL)||I_CAL==-1){I_CAL = 5.0f;}
   if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
   if(isnan(GR) || GR==-1){GR = 1.0f;}
   if(isnan(KT) || KT==-1){KT = 1.0f;}
@@ -259,6 +260,7 @@ int main(void)
 
 	  HAL_Delay(100);
 	  drv_print_faults(drv);
+	  //printf("\r\n %.3f  %.3f  %.3f\r\n", controller.i_q_filt, controller.i_d_filt, controller.theta_elec);
 
     /* USER CODE END WHILE */
 

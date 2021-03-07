@@ -57,8 +57,8 @@
 #define KI_D 0.0455f                // PI zero, in radians per sample
 #define KI_Q 0.0455f                // PI zero, in radians per sample
 #define OVERMODULATION 1.15f        // 1.0 = no overmodulation
-#define CURRENT_FILT_ALPHA	.001f	// 1st order d/q current filter (not used in control)
-#define VBUS_FILT_ALPHA		.01f	// 1st order bus voltage filter
+#define CURRENT_FILT_ALPHA	.01f	// 1st order d/q current filter (not used in control)
+#define VBUS_FILT_ALPHA		.1f		// 1st order bus voltage filter
 
 #define D_INT_LIM V_BUS/(K_D*KI_D)  // Amps*samples
 #define Q_INT_LIM V_BUS/(K_Q*KI_Q)  // Amps*samples
