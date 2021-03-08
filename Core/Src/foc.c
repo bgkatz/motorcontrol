@@ -43,13 +43,13 @@ void analog_sample (ControllerStruct *controller){
 	/* Sampe ADCs */
 	/* Handle phase order swapping so that voltage/current/torque match encoder direction */
 	if(!PHASE_ORDER){
-		controller->adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IA);
-		controller->adc_a_raw = HAL_ADC_GetValue(&ADC_CH_IB);
+		controller->adc_a_raw = HAL_ADC_GetValue(&ADC_CH_IA);
+		controller->adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IB);
 		//adc_ch_ic = ADC_CH_IC;
 	}
 	else{
-		controller->adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IB);
-		controller->adc_a_raw = HAL_ADC_GetValue(&ADC_CH_IA);
+		controller->adc_a_raw = HAL_ADC_GetValue(&ADC_CH_IB);
+		controller->adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IA);
 		//adc_ch_ic = ADC_CH_IB;
 	}
 
@@ -235,12 +235,9 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        /// Commutation  ///
        dq0(controller->theta_elec, controller->i_a, controller->i_b, controller->i_c, &controller->i_d, &controller->i_q);    //dq0 transform on currents - 3.8 us
 
-
        controller->i_q_filt = (1.0f-CURRENT_FILT_ALPHA)*controller->i_q_filt + CURRENT_FILT_ALPHA*controller->i_q;	// these aren't used for control but are sometimes nice for debugging
        controller->i_d_filt = (1.0f-CURRENT_FILT_ALPHA)*controller->i_d_filt + CURRENT_FILT_ALPHA*controller->i_d;
        controller->v_bus_filt = (1.0f-VBUS_FILT_ALPHA)*controller->v_bus_filt + VBUS_FILT_ALPHA*controller->v_bus;	// used for voltage saturation
-
-
 
        controller->v_max = OVERMODULATION*controller->v_bus_filt*(DTC_MAX-DTC_MIN)*SQRT1_3;
        controller->i_max = I_MAX; //I_MAX*(!controller->otw_flag) + I_MAX_CONT*controller->otw_flag;
@@ -270,14 +267,12 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        controller->v_ref = sqrtf(controller->v_d*controller->v_d + controller->v_q*controller->v_q);
        controller->v_q = fast_fmaxf(fast_fminf(controller->v_q, vq_max), -vq_max);
 
-
        limit_norm(&controller->v_d, &controller->v_q, controller->v_max);
-
 
        abc(controller->theta_elec + 1.5f*DT*controller->dtheta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
        svm(controller->v_max, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
-       //set_dtc(controller);
+       set_dtc(controller);
 
     }
 

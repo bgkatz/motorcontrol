@@ -256,11 +256,11 @@ int main(void)
   while (1)
   {
 
-	  HAL_Delay(1);
+	  HAL_Delay(10);
 	  drv_print_faults(drv);
-	  if(state.state==MOTOR_MODE){
-		  printf("%.2f %.2f %.2f %.2f %.2f\r\n", controller.i_a, controller.i_b, controller.i_d, controller.i_q, controller.theta_elec);
-	  }
+	  //if(state.state==MOTOR_MODE){
+	  //	  printf("%.2f %.2f %.2f %.2f %.2f\r\n", controller.i_a, controller.i_b, controller.i_d, controller.i_q, controller.dtheta_elec);
+	  //}
 
     /* USER CODE END WHILE */
 

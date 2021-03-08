@@ -66,8 +66,7 @@
 			 /* Otherwise, commutate */
 			 else{
 				 torque_control(&controller);
-				 //field_weaken(&controller);
-				 //controller.i_q_des = 2.0f;
+				 field_weaken(&controller);
 				 commutate(&controller, &comm_encoder);
 			 }
 			 controller.timeout ++;
