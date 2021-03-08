@@ -259,7 +259,7 @@ int main(void)
 	  HAL_Delay(1);
 	  drv_print_faults(drv);
 	  if(state.state==MOTOR_MODE){
-		  printf("%.3f  %.3f  %.3f  %.3f  %.3f\r\n", controller.i_a, controller.i_b, controller.i_d, controller.i_q, controller.theta_elec);
+		  printf("%.2f %.2f %.2f %.2f %.2f\r\n", controller.i_a, controller.i_b, controller.i_d, controller.i_q, controller.theta_elec);
 	  }
 
     /* USER CODE END WHILE */

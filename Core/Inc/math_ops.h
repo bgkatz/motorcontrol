@@ -11,8 +11,8 @@
 
 #include "math.h"
 
-//float fmaxf(float x, float y);
-//float fminf(float x, float y);
+float fast_fmaxf(float x, float y);
+float fast_fminf(float x, float y);
 float fmaxf3(float x, float y, float z);
 float fminf3(float x, float y, float z);
 //float roundf(float x);

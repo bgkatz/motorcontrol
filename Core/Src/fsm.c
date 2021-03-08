@@ -65,10 +65,9 @@
 			 }
 			 /* Otherwise, commutate */
 			 else{
-				 //torque_control(&controller);
+				 torque_control(&controller);
 				 //field_weaken(&controller);
 				 //controller.i_q_des = 2.0f;
-				 //controller.i_d_des = 0.0f;
 				 commutate(&controller, &comm_encoder);
 			 }
 			 controller.timeout ++;
@@ -104,6 +103,7 @@
 				//printf("Entering Encoder Mode\r\n");
 				break;
 			case MOTOR_MODE:
+
 				//printf("Entering Motor Mode\r\n");
 				HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
 				reset_foc(&controller);

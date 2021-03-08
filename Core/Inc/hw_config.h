@@ -30,6 +30,7 @@
 #define ENC_SPI			hspi3				// Encoder SPI handle
 #define ENC_CS			GPIOA, GPIO_PIN_15	// Encoder SPI CS pin
 #define ENC_CPR			65536				// Encoder counts per revolution
+#define INV_CPR			1.0f/ENC_CPR
 #define ENC_READ_WORD	0x00				// Encoder read command
 
 /* Misc. GPIO */

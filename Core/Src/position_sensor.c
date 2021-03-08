@@ -34,7 +34,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	/* SPI read/write */
 	encoder->spi_tx_word = ENC_READ_WORD;
 	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
-	HAL_SPI_TransmitReceive(&ENC_SPI, (uint8_t*)encoder->spi_tx_buff, (uint8_t *)encoder->spi_rx_buff, 1, 100);
+	HAL_SPI_TransmitReceive_DMA(&ENC_SPI, (uint8_t*)encoder->spi_tx_buff, (uint8_t *)encoder->spi_rx_buff, 1);
 	while( ENC_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
 	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
 	encoder->raw = encoder ->spi_rx_word;
@@ -42,15 +42,22 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	/* Linearization */
 	int off_1 = encoder->offset_lut[(encoder->raw)>>9];				// lookup table lower entry
 	int off_2 = encoder->offset_lut[((encoder->raw>>9)+1)%128];		// lookup table higher entry
-	int off_interp = off_1; + ((off_2 - off_1)*(encoder->raw - ((encoder->raw>>9)<<9))>>9);     // Interpolate between lookup table entries
+	int off_interp = off_1 + ((off_2 - off_1)*(encoder->raw - ((encoder->raw>>9)<<9))>>9);     // Interpolate between lookup table entries
 	encoder->count = encoder->raw + off_interp;
 
-	/* Real angles in radians */
-	encoder->angle_singleturn = TWO_PI_F*fmodf(((float)(encoder->count-M_ZERO))/((float)ENC_CPR), 1.0f);
-	encoder->angle_singleturn = encoder->angle_singleturn<0 ? encoder->angle_singleturn + TWO_PI_F : encoder->angle_singleturn;
-	encoder->elec_angle = TWO_PI_F*fmodf((encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR), 1.0f);
-	encoder->elec_angle = encoder->elec_angle<0 ? encoder->elec_angle + TWO_PI_F : encoder->elec_angle;	// Add 2*pi to negative numbers
 
+	/* Real angles in radians */
+	encoder->angle_singleturn = ((float)(encoder->count-M_ZERO))/((float)ENC_CPR);
+	int int_angle = encoder->angle_singleturn;
+	encoder->angle_singleturn = TWO_PI_F*(encoder->angle_singleturn - (float)int_angle);
+	//encoder->angle_singleturn = TWO_PI_F*fmodf(((float)(encoder->count-M_ZERO))/((float)ENC_CPR), 1.0f);
+	encoder->angle_singleturn = encoder->angle_singleturn<0 ? encoder->angle_singleturn + TWO_PI_F : encoder->angle_singleturn;
+
+	encoder->elec_angle = (encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR);
+	int_angle = (int)encoder->elec_angle;
+	encoder->elec_angle = TWO_PI_F*(encoder->elec_angle - (float)int_angle);
+	//encoder->elec_angle = TWO_PI_F*fmodf((encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR), 1.0f);
+	encoder->elec_angle = encoder->elec_angle<0 ? encoder->elec_angle + TWO_PI_F : encoder->elec_angle;	// Add 2*pi to negative numbers
 	/* Rollover */
 	float angle_diff = encoder->angle_singleturn - encoder->old_angle;
 	if(angle_diff > PI_F){encoder->turns--;}
@@ -59,6 +66,8 @@ void ps_sample(EncoderStruct * encoder, float dt){
 		encoder->turns = 0;
 		encoder->first_sample = 1;
 	}
+
+
 
 	/* Multi-turn position */
 	encoder->angle_multiturn[0] = encoder->angle_singleturn + TWO_PI_F*(float)encoder->turns;
@@ -79,6 +88,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	//encoder->velocity = vel2
 	encoder->velocity = (encoder->angle_multiturn[0] - encoder->angle_multiturn[N_POS_SAMPLES-1])/(dt*(float)(N_POS_SAMPLES-1));
 	encoder->elec_velocity = encoder->ppairs*encoder->velocity;
+
 }
 
 void ps_print(EncoderStruct * encoder, int dt_ms){
