@@ -14,32 +14,28 @@
 #include "user_config.h"
 
 void set_dtc(ControllerStruct *controller){
-	/* Output duty cycle from controller to the pwm timer */
-	uint32_t tim_ch_u;
-	uint32_t tim_ch_v;
-	uint32_t tim_ch_w;
-	/* Handle phase order swapping so that voltage/current/torque match encoder direction */
-	if(!PHASE_ORDER){
-		tim_ch_u = TIM_CH_U;
-		tim_ch_v = TIM_CH_V;
-		tim_ch_w = TIM_CH_W;
-	}
-	else{
-		tim_ch_u = TIM_CH_U;
-		tim_ch_v = TIM_CH_W;
-		tim_ch_w = TIM_CH_V;
-	}
 
 	/* Invert duty cycle if that's how hardware is configured */
+
+	float dtc_u = controller->dtc_u;
+	float dtc_v = controller->dtc_v;
+	float dtc_w = controller->dtc_w;
+
 	if(INVERT_DTC){
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_u, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_u));
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_v, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_v));
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_w, ((TIM_PWM.Instance->ARR))*(1.0f-controller->dtc_w));
+		dtc_u = 1.0f - controller->dtc_u;
+		dtc_v = 1.0f - controller->dtc_v;
+		dtc_w = 1.0f - controller->dtc_w;
+	}
+	/* Handle phase order swapping so that voltage/current/torque match encoder direction */
+	if(!PHASE_ORDER){
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_U, ((TIM_PWM.Instance->ARR))*dtc_u);
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_V, ((TIM_PWM.Instance->ARR))*dtc_v);
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_W, ((TIM_PWM.Instance->ARR))*dtc_w);
 	}
 	else{
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_u, ((TIM_PWM.Instance->ARR))*(controller->dtc_u));
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_v, ((TIM_PWM.Instance->ARR))*(controller->dtc_v));
-		__HAL_TIM_SET_COMPARE(&TIM_PWM, tim_ch_w, ((TIM_PWM.Instance->ARR))*(controller->dtc_w));
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_U, ((TIM_PWM.Instance->ARR))*dtc_u);
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_W, ((TIM_PWM.Instance->ARR))*dtc_v);
+		__HAL_TIM_SET_COMPARE(&TIM_PWM, TIM_CH_V, ((TIM_PWM.Instance->ARR))*dtc_w);
 	}
 }
 
