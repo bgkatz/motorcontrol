@@ -33,6 +33,7 @@ typedef struct{
     int mode;
     int ovp_flag;                                           // Over-voltage flag
     int oc_flag;											// Over-current flag
+    int phase_order;
     union{
     	float commands[5];									// Making this easier to pass around without including foc.h everywhere
     	struct{

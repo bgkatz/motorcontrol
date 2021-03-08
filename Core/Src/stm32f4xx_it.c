@@ -253,10 +253,8 @@ void TIM1_UP_TIM10_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
 
 	/* Sample ADCs */
-
-	HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
 	analog_sample(&controller);
-	HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
+
 	/* Sample position sensor */
 	ps_sample(&comm_encoder, DT);
 

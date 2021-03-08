@@ -45,29 +45,24 @@ void set_dtc(ControllerStruct *controller){
 
 void analog_sample (ControllerStruct *controller){
 	/* Sampe ADCs */
-
-	ADC_HandleTypeDef adc_ch_ia;
-	ADC_HandleTypeDef adc_ch_ib;
-	ADC_HandleTypeDef adc_ch_ic;
-
 	/* Handle phase order swapping so that voltage/current/torque match encoder direction */
 	if(!PHASE_ORDER){
-		adc_ch_ia = ADC_CH_IA;
-		adc_ch_ib = ADC_CH_IB;
+		controller->adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IA);
+		controller->adc_a_raw = HAL_ADC_GetValue(&ADC_CH_IB);
 		//adc_ch_ic = ADC_CH_IC;
 	}
 	else{
-		adc_ch_ib = ADC_CH_IA;
-		adc_ch_ia = ADC_CH_IB;
+		controller->adc_b_raw = HAL_ADC_GetValue(&ADC_CH_IB);
+		controller->adc_a_raw = HAL_ADC_GetValue(&ADC_CH_IA);
 		//adc_ch_ic = ADC_CH_IB;
 	}
 
+
 	HAL_ADC_Start(&ADC_CH_MAIN);
 	HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
-	controller->adc_b_raw = HAL_ADC_GetValue(&adc_ch_ib);
-	controller->adc_a_raw = HAL_ADC_GetValue(&adc_ch_ia);
+
 	controller->adc_vbus_raw = HAL_ADC_GetValue(&ADC_CH_VBUS);
-	controller->v_bus = controller->adc_vbus_raw*V_SCALE;
+	controller->v_bus = (float)controller->adc_vbus_raw*V_SCALE;
 
     controller->i_a = I_SCALE*(float)(controller->adc_a_raw - controller->adc_a_offset);    // Calculate phase currents from ADC readings
     controller->i_b = I_SCALE*(float)(controller->adc_b_raw - controller->adc_b_offset);
@@ -144,6 +139,7 @@ void init_controller_params(ControllerStruct *controller){
     controller->k_q = K_SCALE*I_BW;
     controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*TWO_PI_F);
     controller->ki_fw = .1f*controller->ki_d;
+    controller->phase_order = PHASE_ORDER;
     for(int i = 0; i<128; i++)	// Approximate duty cycle linearization
     {
         controller->inverter_tab[i] = 1.0f + 1.2f*exp(-0.0078125f*i/.032f);
