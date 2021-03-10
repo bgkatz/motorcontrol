@@ -249,20 +249,24 @@
 	    printf("\r\n Configuration Options \n\r");
 	    printf(" %-4s %-31s %-5s %-6s %-2s\r\n", "prefix", "parameter", "min", "max", "current value");
 	    printf("\r\n Motor:\r\n");
-	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "g", "Gear Ratio", "-", "-", GR);
-	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "k", "Kt (N-m/A)", "-", "-", KT);
-	    printf("\r\n Current Control:\r\n");
+	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "g", "Gear Ratio", "0", "-", GR);
+	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "t", "Torque Constant (N-m/A)", "0", "-", KT);
+	    printf("\r\n Control:\r\n");
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "b", "Current Bandwidth (Hz)", "100", "2000", I_BW);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "l", "Current Limit (A)", "0.0", "40.0", I_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "p", "Max Position Setpoint (rad)", "-", "-", P_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "v", "Max Velocity Setpoint (rad)/s", "-", "-", V_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "x", "Max Position Gain (N-m/rad)", "0.0", "1000.0", KP_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "d", "Max Velocity Gain (N-m/rad/s)", "0.0", "5.0", KD_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "f", "FW Current Limit (A)", "0.0", "33.0", I_FW_MAX);
 	    //printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "h", "Temp Cutoff (C) (0 = none)", "0", "150", TEMP_MAX);
-	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "c", "Continuous Current (A)", "0", "40.0", I_MAX_CONT);
-	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "a", "Calibration Current (A)", "0", "20.0", I_CAL);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "c", "Continuous Current (A)", "0.0", "40.0", I_MAX_CONT);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "a", "Calibration Current (A)", "0.0", "20.0", I_CAL);
 	    printf("\r\n CAN:\r\n");
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "i", "CAN ID", "0", "127", CAN_ID);
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "m", "CAN Master ID", "0", "127", CAN_MASTER);
 	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "t", "CAN Timeout (cycles)(0 = none)", "0", "100000", CAN_TIMEOUT);
-	    printf(" \n\r To change a value, type 'prefix''value''ENTER'\n\r i.e. 'b1000''ENTER'\r\n ");
+	    printf(" \n\r To change a value, type 'prefix''value''ENTER'\n\r e.g. 'b1000''ENTER'\r\n ");
 	    printf("VALUES NOT ACTIVE UNTIL POWER CYCLE! \n\r\n\r");
  }
 
@@ -307,12 +311,30 @@
 			 printf("I_CAL set to %f\r\n", I_CAL);
 			 break;
 		 case 'g':
-			 GR = atof(fsmstate->cmd_buff);
+			 GR = fmaxf(atof(fsmstate->cmd_buff), .001f);	// Limit prevents divide by zero if user tries to enter zero
 			 printf("GR set to %f\r\n", GR);
 			 break;
 		 case 'k':
-			 KT = atof(fsmstate->cmd_buff);
+			 KT = fmaxf(atof(fsmstate->cmd_buff), 0.0001f);	// Limit prevents divide by zero.  Seems like a reasonable LB?
 			 printf("KT set to %f\r\n", KT);
+			 break;
+		 case 'x':
+			 KP_MAX = fmaxf(atof(fsmstate->cmd_buff), 0.0f);
+			 printf("KP_MAX set to %f\r\n", KP_MAX);
+			 break;
+		 case 'd':
+			 KD_MAX = fmaxf(atof(fsmstate->cmd_buff), 0.0f);
+			 printf("KD_MAX set to %f\r\n", KD_MAX);
+			 break;
+		 case 'p':
+			 P_MAX = fmaxf(atof(fsmstate->cmd_buff), 0.0f);
+			 P_MIN = -P_MAX;
+			 printf("P_MAX set to %f\r\n", P_MAX);
+			 break;
+		 case 'v':
+			 V_MAX = fmaxf(atof(fsmstate->cmd_buff), 0.0f);
+			 V_MIN = -V_MAX;
+			 printf("V_MAX set to %f\r\n", V_MAX);
 			 break;
 		 default:
 			 printf("\n\r '%c' Not a valid command prefix\n\r\n\r", fsmstate->cmd_buff);

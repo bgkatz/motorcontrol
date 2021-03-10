@@ -9,7 +9,7 @@ extern "C" {
 
 
 #define I_BW                    __float_reg[2]                                  // Current loop bandwidth
-#define I_MAX                   __float_reg[3]                                  // Torque limit (current limit = torque_limit/(kt*gear ratio))
+#define I_MAX                   __float_reg[3]                                  // Current limit
 #define THETA_MIN               __float_reg[4]                                  // Minimum position setpoint
 #define THETA_MAX               __float_reg[5]                                  // Maximum position setpoint
 #define I_FW_MAX                __float_reg[6]                                  // Maximum field weakening current
@@ -25,6 +25,12 @@ extern "C" {
 #define C_TH					__float_reg[16]									// Thermal mass (C/J)
 #define GR						__float_reg[17]									// Gear ratio
 #define I_CAL					__float_reg[18]									// Calibration Current
+#define P_MIN					__float_reg[19]									// Position setpoint lower limit (rad)
+#define P_MAX					__float_reg[20]									// Position setupoint upper bound (rad)
+#define V_MIN					__float_reg[21]									// Velocity setpoint lower bound (rad/s)
+#define V_MAX					__float_reg[22]									// Velocity setpoint upper bound (rad/s)
+#define KP_MAX					__float_reg[23]									// Max position gain (N-m/rad)
+#define KD_MAX					__float_reg[24]									// Max velocity gain (N-m/rad/s)
 
 
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration

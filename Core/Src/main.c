@@ -161,7 +161,7 @@ int main(void)
   if(M_ZERO==-1){M_ZERO = 0;}
   if(isnan(I_BW) || I_BW==-1){I_BW = 1000;}
   if(isnan(I_MAX) || I_MAX ==-1){I_MAX=40;}
-  if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=12;}
+  if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=0;}
   if(CAN_ID==-1){CAN_ID = 1;}
   if(CAN_MASTER==-1){CAN_MASTER = 0;}
   if(CAN_TIMEOUT==-1){CAN_TIMEOUT = 1000;}
@@ -172,6 +172,12 @@ int main(void)
   if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
   if(isnan(GR) || GR==-1){GR = 1.0f;}
   if(isnan(KT) || KT==-1){KT = 1.0f;}
+  if(isnan(KP_MAX) || KP_MAX==-1){KP_MAX = 500.0f;}
+  if(isnan(KD_MAX) || KD_MAX==-1){KD_MAX = 5.0f;}
+  if(isnan(P_MAX)){P_MAX = 12.5f;}
+  if(isnan(P_MIN)){P_MIN = -12.5f;}
+  if(isnan(V_MAX)){V_MAX = 65.0f;}
+  if(isnan(V_MIN)){V_MIN = -65.0f;}
 
   printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
 
@@ -256,12 +262,11 @@ int main(void)
   while (1)
   {
 
-	  HAL_Delay(10);
+	  HAL_Delay(100);
 	  drv_print_faults(drv);
 	  //if(state.state==MOTOR_MODE){
 	  //	  printf("%.2f %.2f %.2f %.2f %.2f\r\n", controller.i_a, controller.i_b, controller.i_d, controller.i_q, controller.dtheta_elec);
 	  //}
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
