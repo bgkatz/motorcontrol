@@ -4,4 +4,4 @@ can.c:87:6:HAL_CAN_MspDeInit	8	static
 can.c:114:6:can_rx_init	0	static
 can.c:126:6:can_tx_init	0	static
 can.c:144:6:pack_reply	32	static
-can.c:172:6:unpack_cmd	32	static
+can.c:172:6:unpack_cmd	40	static
