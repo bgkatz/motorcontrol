@@ -100,9 +100,9 @@ void svm(float v_max, float u, float v, float w, float *dtc_u, float *dtc_v, flo
     float v_offset = (fminf3(u, v, w) + fmaxf3(u, v, w))*0.5f;
     float v_midpoint = .5f*(DTC_MAX+DTC_MIN);
 
-    *dtc_u = fast_fminf(fast_fmaxf((.5f*(u -v_offset)/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
-    *dtc_v = fast_fminf(fast_fmaxf((.5f*(v -v_offset)/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
-    *dtc_w = fast_fminf(fast_fmaxf((.5f*(w -v_offset)/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
+    *dtc_u = fast_fminf(fast_fmaxf((.5f*(u -v_offset)*OVERMODULATION/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
+    *dtc_v = fast_fminf(fast_fmaxf((.5f*(v -v_offset)*OVERMODULATION/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
+    *dtc_w = fast_fminf(fast_fmaxf((.5f*(w -v_offset)*OVERMODULATION/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
 
     }
 
