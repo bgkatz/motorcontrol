@@ -9,4 +9,4 @@ stm32f4xx_hal_rcc_ex.c:2992:19:HAL_RCCEx_DisablePLLSAI	16	static
 stm32f4xx_hal_rcc_ex.c:3053:10:HAL_RCC_GetSysClockFreq	8	static
 stm32f4xx_hal_rcc_ex.c:3145:19:HAL_RCC_DeInit	16	static
 stm32f4xx_hal_rcc_ex.c:3335:19:HAL_RCC_OscConfig	32	static
-stm32f4xx_hal_rcc_ex.c:3672:6:HAL_RCC_GetOscConfig	0	static
+stm32f4xx_hal_rcc_ex.c:3705:6:HAL_RCC_GetOscConfig	0	static
