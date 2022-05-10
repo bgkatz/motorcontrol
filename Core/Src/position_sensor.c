@@ -29,6 +29,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	/* Shift around previous samples */
 	encoder->old_angle = encoder->angle_singleturn;
 	for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];}
+	//for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->count_buff[i] = encoder->count_buff[i-1];}
 	//memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float)); // this is much slower for some reason
 
 	/* SPI read/write */
@@ -59,9 +60,11 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	//encoder->elec_angle = TWO_PI_F*fmodf((encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR), 1.0f);
 	encoder->elec_angle = encoder->elec_angle<0 ? encoder->elec_angle + TWO_PI_F : encoder->elec_angle;	// Add 2*pi to negative numbers
 	/* Rollover */
+	int rollover = 0;
 	float angle_diff = encoder->angle_singleturn - encoder->old_angle;
-	if(angle_diff > PI_F){encoder->turns--;}
-	else if(angle_diff < -PI_F){encoder->turns++;}
+	if(angle_diff > PI_F){rollover = -1;}
+	else if(angle_diff < -PI_F){rollover = 1;}
+	encoder->turns += rollover;
 	if(!encoder->first_sample){
 		encoder->turns = 0;
 		encoder->first_sample = 1;

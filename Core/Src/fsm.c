@@ -142,13 +142,13 @@
 				break;
 			case MOTOR_MODE:
 				/* Don't stop commutating if there are high currents or FW happening */
-				if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
+				//if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
 					fsmstate->ready = 1;
 					drv_disable_gd(drv);
 					reset_foc(&controller);
 					//printf("Leaving Motor Mode\r\n");
 					HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
-				}
+				//}
 				zero_commands(&controller);		// Set commands to zero
 				break;
 			case CALIBRATION_MODE:
@@ -167,7 +167,7 @@
 	 /*update_fsm is only run when new state-change information is received
 	  * on serial terminal input or CAN input
 	  */
-	if(fsm_input == MENU_CMD){	// escape to exit do rest mode
+	if(fsm_input == MENU_CMD){	// escape to exit to rest mode
 		fsmstate->next_state = MENU_MODE;
 		fsmstate->ready = 0;
 		return;
@@ -194,14 +194,13 @@
 				case ZERO_CMD:
 					comm_encoder.m_zero = 0;
 					ps_sample(&comm_encoder, DT);
-					HAL_Delay(20);
-					M_ZERO = comm_encoder.count;
-					//if (!prefs.ready()) prefs.open();
-					//    prefs.flush();                                                  // Write new prefs to flash
-					//    prefs.close();
-					//    prefs.load();
-					//spi.SetMechOffset(M_OFFSET);
-					printf("\n\r  Saved new zero position:  %.4f\n\r\n\r", M_ZERO);
+					int zero_count = comm_encoder.count;
+					M_ZERO = zero_count;
+					if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+					preference_writer_flush(&prefs);
+					preference_writer_close(&prefs);
+					preference_writer_load(prefs);
+					printf("\n\r  Saved new zero position:  %d\n\r\n\r", M_ZERO);
 					break;
 				}
 			break;
@@ -264,7 +263,7 @@
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "a", "Calibration Current (A)", "0.0", "20.0", I_CAL);
 	    printf("\r\n CAN:\r\n");
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "i", "CAN ID", "0", "127", CAN_ID);
-	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "m", "CAN Master ID", "0", "127", CAN_MASTER);
+	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "m", "CAN TX ID", "0", "127", CAN_MASTER);
 	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "t", "CAN Timeout (cycles)(0 = none)", "0", "100000", CAN_TIMEOUT);
 	    printf(" \n\r To change a value, type 'prefix''value''ENTER'\n\r e.g. 'b1000''ENTER'\r\n ");
 	    printf("VALUES NOT ACTIVE UNTIL POWER CYCLE! \n\r\n\r");
@@ -284,7 +283,7 @@
 			 break;
 		 case 'm':
 			 CAN_MASTER = atoi(fsmstate->cmd_buff);
-			 printf("CAN_MASTER set to %d\r\n", CAN_MASTER);
+			 printf("CAN_TX_ID set to %d\r\n", CAN_MASTER);
 			 break;
 		 case 'l':
 			 I_MAX = fmaxf(fminf(atof(fsmstate->cmd_buff), 40.0f), 0.0f);

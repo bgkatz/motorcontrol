@@ -229,7 +229,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 
 		controller->theta_elec = encoder->elec_angle;
 		controller->dtheta_elec = encoder->elec_velocity;
-		controller->dtheta_mech = encoder->velocity*GR;
+		controller->dtheta_mech = encoder->velocity/GR;
 		controller->theta_mech = encoder->angle_multiturn[0]/GR;
 
        /// Commutation  ///
