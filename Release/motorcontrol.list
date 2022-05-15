@@ -2896,15 +2896,15 @@ Disassembly of section .text:
  800228a:	ed91 0a17 	vldr	s0, [r1, #92]	; 0x5c
  800228e:	6e4b      	ldr	r3, [r1, #100]	; 0x64
  8002290:	4d89      	ldr	r5, [pc, #548]	; (80024b8 <commutate+0x230>)
- 8002292:	edd1 7a18 	vldr	s15, [r1, #96]	; 0x60
- 8002296:	edd1 6a03 	vldr	s13, [r1, #12]
- 800229a:	ed2d 8b04 	vpush	{d8-d9}
- 800229e:	6343      	str	r3, [r0, #52]	; 0x34
- 80022a0:	ed80 0a0b 	vstr	s0, [r0, #44]	; 0x2c
- 80022a4:	ed95 7a11 	vldr	s14, [r5, #68]	; 0x44
- 80022a8:	ed9f 9a84 	vldr	s18, [pc, #528]	; 80024bc <commutate+0x234>
- 80022ac:	ee67 7a87 	vmul.f32	s15, s15, s14
- 80022b0:	4604      	mov	r4, r0
+ 8002292:	edd1 6a18 	vldr	s13, [r1, #96]	; 0x60
+ 8002296:	ed2d 8b04 	vpush	{d8-d9}
+ 800229a:	6343      	str	r3, [r0, #52]	; 0x34
+ 800229c:	ed80 0a0b 	vstr	s0, [r0, #44]	; 0x2c
+ 80022a0:	ed95 7a11 	vldr	s14, [r5, #68]	; 0x44
+ 80022a4:	ed9f 9a85 	vldr	s18, [pc, #532]	; 80024bc <commutate+0x234>
+ 80022a8:	eec6 7a87 	vdiv.f32	s15, s13, s14
+ 80022ac:	4604      	mov	r4, r0
+ 80022ae:	edd1 6a03 	vldr	s13, [r1, #12]
  80022b2:	edc0 7a0c 	vstr	s15, [r0, #48]	; 0x30
  80022b6:	ed95 7a11 	vldr	s14, [r5, #68]	; 0x44
  80022ba:	edd4 1a07 	vldr	s3, [r4, #28]
