@@ -1,6 +1,6 @@
 fsm.c:126:7:fsm_exit_state	8	static
 fsm.c:231:7:enter_menu_state	8	static
-fsm.c:247:7:enter_setup_state	48	static
+fsm.c:247:7:enter_setup_state	40	static
 fsm.c:88:7:fsm_enter_state	8	static
 fsm.c:21:7:run_fsm	32	static
 fsm.c:272:7:process_user_input	24	static

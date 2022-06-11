@@ -60,8 +60,8 @@ void analog_sample (ControllerStruct *controller){
 	controller->adc_vbus_raw = HAL_ADC_GetValue(&ADC_CH_VBUS);
 	controller->v_bus = (float)controller->adc_vbus_raw*V_SCALE;
 
-    controller->i_a = I_SCALE*(float)(controller->adc_a_raw - controller->adc_a_offset);    // Calculate phase currents from ADC readings
-    controller->i_b = I_SCALE*(float)(controller->adc_b_raw - controller->adc_b_offset);
+    controller->i_a = controller->i_scale*(float)(controller->adc_a_raw - controller->adc_a_offset);    // Calculate phase currents from ADC readings
+    controller->i_b = controller->i_scale*(float)(controller->adc_b_raw - controller->adc_b_offset);
     controller->i_c = -controller->i_a - controller->i_b;
 
 }
@@ -136,6 +136,8 @@ void init_controller_params(ControllerStruct *controller){
     controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*TWO_PI_F);
     controller->ki_fw = .1f*controller->ki_d;
     controller->phase_order = PHASE_ORDER;
+    if(I_MAX <= 40.0f){controller->i_scale = I_SCALE;}
+    else{controller->i_scale = 2.0f*I_SCALE;}
     for(int i = 0; i<128; i++)	// Approximate duty cycle linearization
     {
         controller->inverter_tab[i] = 1.0f + 1.2f*exp(-0.0078125f*i/.032f);

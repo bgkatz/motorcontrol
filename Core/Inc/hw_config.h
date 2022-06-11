@@ -40,8 +40,8 @@
 #define CAN_H			hcan1				// CAN handle
 
 /* Other hardware-related constants */
-#define I_SCALE 			0.02014160156f  // Amps per A/D Count
-#define V_SCALE 			0.012890625f    // Bus volts per A/D Count
+#define I_SCALE 			0.0201416f  // Amps per A/D Count at 40X amplifier gain
+#define V_SCALE 			0.0128906f    // Bus volts per A/D Count
 #define DTC_MAX 			0.94f          	// Max duty cycle
 #define DTC_MIN 			0.0f          	// Min duty cycle
 #define DTC_COMP 			0.000f          // deadtime compensation (100 ns / 25 us)
