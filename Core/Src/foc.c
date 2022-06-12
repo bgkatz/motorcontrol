@@ -217,7 +217,7 @@ void field_weaken(ControllerStruct *controller)
 {
        /// Field Weakening ///
 
-       controller->fw_int += .005f*(controller->v_max - controller->v_ref);
+       controller->fw_int += controller->ki_fw*(controller->v_max - controller->v_ref);
        controller->fw_int = fast_fmaxf(fast_fminf(controller->fw_int, 0.0f), -I_FW_MAX);
        controller->i_d_des = controller->fw_int;
        float q_max = sqrtf(controller->i_max*controller->i_max - controller->i_d_des*controller->i_d_des);
@@ -282,7 +282,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 void torque_control(ControllerStruct *controller){
 
     float torque_des = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
-    controller->i_q_des = torque_des/(KT*GR);
+    controller->i_q_des = fast_fmaxf(fast_fminf(torque_des/(KT*GR), controller->i_max), -controller->i_max);
     controller->i_d_des = 0.0f;
 
     }
