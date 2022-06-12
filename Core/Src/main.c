@@ -225,7 +225,7 @@ int main(void)
   HAL_Delay(1);
   zero_current(&controller);
   HAL_Delay(1);
-  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_RETRY, OCP_DEG_4US, VDS_LVL_0_6);
+  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_RETRY, OCP_DEG_4US, VDS_LVL_0_45);
   HAL_Delay(1);
   drv_disable_gd(drv);
   HAL_Delay(1);
@@ -244,8 +244,8 @@ int main(void)
   __HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING); // Start can interrupt
 
   /* Set Interrupt Priorities */
-  NVIC_SetPriority(PWM_ISR, 1); // commutation > communication
-  NVIC_SetPriority(CAN_ISR, 3);
+  HAL_NVIC_SetPriority(PWM_ISR, 0x0,0x0); // commutation > communication
+  HAL_NVIC_SetPriority(CAN_ISR, 0x01, 0x01);
 
   /* Start the FSM */
   state.state = MENU_MODE;
