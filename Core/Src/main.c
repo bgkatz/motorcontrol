@@ -241,7 +241,7 @@ int main(void)
   can_rx_init(&can_rx);
   can_tx_init(&can_tx);
   HAL_CAN_Start(&CAN_H); //start CAN
-  __HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING); // Start can interrupt
+  //__HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING); // Start can interrupt
 
   /* Set Interrupt Priorities */
   HAL_NVIC_SetPriority(PWM_ISR, 0x0,0x0); // commutation > communication
