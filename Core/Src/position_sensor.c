@@ -67,6 +67,8 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->turns += rollover;
 	if(!encoder->first_sample){
 		encoder->turns = 0;
+		if(encoder->angle_singleturn > PI_OVER_2_F){encoder->turns = -1;}
+		else if(encoder->angle_singleturn < -PI_OVER_2_F){encoder->turns = 1;}
 		encoder->first_sample = 1;
 	}
 

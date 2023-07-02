@@ -47,17 +47,17 @@
 #define DTC_COMP 			0.000f          // deadtime compensation (100 ns / 25 us)
 #define DT					.000025f		// Loop period
 #define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
-
+#define V_BUS_MAX			40.0f			// max drive voltage (faults above this)
 
 /* Current controller */
-#define L_D .000003f				// D axis inductance
-#define L_Q .000003f				// Q axis inductance
-#define K_D .05f                    // Loop gain,  Volts/Amp
-#define K_Q .05f                    // Loop gain,  Volts/Amp
-#define K_SCALE 0.0001f             // K_loop/Loop BW (Hz) 0.0042
+#define L_D .00004f				// D axis inductance
+#define L_Q .00004f				// Q axis inductance
+#define K_D .1f                    // Loop gain,  Volts/Amp
+#define K_Q .1f                    // Loop gain,  Volts/Amp
+#define K_SCALE 0.00012f             // K_loop/Loop BW (Hz) 0.0042
 #define KI_D 0.045f                // PI zero, in radians per sample
 #define KI_Q 0.045f                // PI zero, in radians per sample
-#define OVERMODULATION 1.15f        // 1.0 = no overmodulation
+#define OVERMODULATION 1.0f        // 1.0 = no overmodulation
 #define CURRENT_FILT_ALPHA	.1f	// 1st order d/q current filter (not used in control)
 #define VBUS_FILT_ALPHA		.1f		// 1st order bus voltage filter
 

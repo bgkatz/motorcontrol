@@ -134,7 +134,7 @@ void can_rx_init(CANRxMessage *msg){
 }
 
 void can_tx_init(CANTxMessage *msg){
-	msg->tx_header.DLC = 6; 			// message size of 8 byte
+	msg->tx_header.DLC = 7; 			// message size of 7 byte
 	msg->tx_header.IDE=CAN_ID_STD; 		// set identifier to standard
 	msg->tx_header.RTR=CAN_RTR_DATA; 	// set data type to remote transmission request?
 	msg->tx_header.StdId = CAN_MASTER;  // recipient CAN ID
@@ -151,16 +151,18 @@ void can_tx_init(CANTxMessage *msg){
 /// 2: [velocity[11-4]]
 /// 3: [velocity[3-0], current[11-8]]
 /// 4: [current[7-0]]
-void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t){
+void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t, float vb){
     int p_int = float_to_uint(p, P_MIN, P_MAX, 16);
     int v_int = float_to_uint(v, V_MIN, V_MAX, 12);
-    int t_int = float_to_uint(t, -I_MAX*KT*GR, I_MAX*KT*GR, 12);
+    int t_int = float_to_uint(t, -(I_MAX+SENSE_BUFFER)*KT*GR, (I_MAX+SENSE_BUFFER)*KT*GR, 12);
+    int vb_int = float_to_uint(vb, VB_MIN, VB_MAX, 8);
     msg->data[0] = id;
     msg->data[1] = p_int>>8;
     msg->data[2] = p_int&0xFF;
     msg->data[3] = v_int>>4;
     msg->data[4] = ((v_int&0xF)<<4) + (t_int>>8);
     msg->data[5] = t_int&0xFF;
+    msg->data[6] = vb_int;
     }
 
 /// CAN Command Packet Structure ///

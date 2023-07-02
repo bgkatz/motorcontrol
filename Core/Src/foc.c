@@ -136,6 +136,7 @@ void init_controller_params(ControllerStruct *controller){
     controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*TWO_PI_F);
     controller->ki_fw = .1f*controller->ki_d;
     controller->phase_order = PHASE_ORDER;
+    controller->flux_linkage = KT/(1.5f*PPAIRS);
     if(I_MAX <= 40.0f){controller->i_scale = I_SCALE;}
     else{controller->i_scale = 2.0f*I_SCALE;}
     for(int i = 0; i<128; i++)	// Approximate duty cycle linearization
@@ -217,8 +218,9 @@ void field_weaken(ControllerStruct *controller)
 {
        /// Field Weakening ///
 
-       controller->fw_int += controller->ki_fw*(controller->v_max - controller->v_ref);
+       controller->fw_int += controller->ki_fw*(controller->v_max - 1.0f - controller->v_ref);
        controller->fw_int = fast_fmaxf(fast_fminf(controller->fw_int, 0.0f), -I_FW_MAX);
+       controller->i_q_des = controller->i_q_des + (controller->i_q_des > 0)*controller->fw_int + (controller->i_q_des < 0)*controller->fw_int;
        controller->i_d_des = controller->fw_int;
        float q_max = sqrtf(controller->i_max*controller->i_max - controller->i_d_des*controller->i_d_des);
        controller->i_q_des = fast_fmaxf(fast_fminf(controller->i_q_des, q_max), -q_max);
@@ -242,6 +244,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        controller->v_bus_filt = (1.0f-VBUS_FILT_ALPHA)*controller->v_bus_filt + VBUS_FILT_ALPHA*controller->v_bus;	// used for voltage saturation
 
        controller->v_max = OVERMODULATION*controller->v_bus_filt*(DTC_MAX-DTC_MIN)*SQRT1_3;
+       controller->v_margin = controller->v_max - controller->v_ref;
        controller->i_max = I_MAX; //I_MAX*(!controller->otw_flag) + I_MAX_CONT*controller->otw_flag;
 
        limit_norm(&controller->i_d_des, &controller->i_q_des, controller->i_max);	// 2.3 us
@@ -250,10 +253,15 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        float i_d_error = controller->i_d_des - controller->i_d;
        float i_q_error = controller->i_q_des - controller->i_q;
 
+       if(controller->i_q > controller->i_mag_max){
+    	   controller->i_mag_max = controller->i_q;
+       }
+
 
        // Calculate decoupling feed-forward voltages //
-       float v_d_ff = 0.0f;//-controller->dtheta_elec*L_Q*controller->i_q;
-       float v_q_ff = 0.0f;//controller->dtheta_elec*L_D*controller->i_d;
+
+       float v_d_ff = 0.0f;//-SQRT3*controller->dtheta_elec*L_Q*controller->i_q;
+       float v_q_ff = 0.0f;//SQRT3*controller->dtheta_elec*(0.0f*L_D*controller->i_d + controller->flux_linkage);
 
        controller->v_d = controller->k_d*i_d_error + controller->d_int + v_d_ff;
 
@@ -261,7 +269,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 
        controller->d_int += controller->k_d*controller->ki_d*i_d_error;
        controller->d_int = fast_fmaxf(fast_fminf(controller->d_int, controller->v_max), -controller->v_max);
-       float vq_max = sqrtf(controller->v_max*controller->v_max - controller->v_d*controller->v_d);
+       float vq_max = controller->v_max;//sqrtf(controller->v_max*controller->v_max - controller->v_d*controller->v_d);
 
        controller->v_q = controller->k_q*i_q_error + controller->q_int + v_q_ff;
        controller->q_int += controller->k_q*controller->ki_q*i_q_error;
@@ -280,9 +288,10 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 
 
 void torque_control(ControllerStruct *controller){
-
-    float torque_des = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
+	controller->t_ff_filt = 0.9f*controller->t_ff_filt + 0.1f*controller->t_ff;
+    float torque_des = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff_filt + controller->kd*(controller->v_des - controller->dtheta_mech);
     controller->i_q_des = fast_fmaxf(fast_fminf(torque_des/(KT*GR), controller->i_max), -controller->i_max);
+    if(controller->v_bus > V_BUS_MAX){controller->i_q_des = 0;}
     controller->i_d_des = 0.0f;
 
     }

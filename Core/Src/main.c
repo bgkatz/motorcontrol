@@ -197,10 +197,11 @@ int main(void)
   comm_encoder.m_zero = M_ZERO;
   comm_encoder.e_zero = E_ZERO;
   comm_encoder.ppairs = PPAIRS;
-  ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
 
   if(EN_ENC_LINEARIZATION){memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));}	// Copy the linearization lookup table
   else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
+  ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
+
   //for(int i = 0; i<128; i++){printf("%d\r\n", comm_encoder.offset_lut[i]);}
 
   /* Turn on ADCs */
@@ -225,7 +226,7 @@ int main(void)
   HAL_Delay(1);
   zero_current(&controller);
   HAL_Delay(1);
-  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_RETRY, OCP_DEG_4US, VDS_LVL_0_45);
+  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_RETRY, OCP_DEG_8US, VDS_LVL_0_45);
   HAL_Delay(1);
   drv_disable_gd(drv);
   HAL_Delay(1);
