@@ -64,11 +64,11 @@
 				 zero_commands(&controller);
 			 }
 			 /* Otherwise, commutate */
-			 else{
-				 torque_control(&controller);
-				 field_weaken(&controller);
-				 commutate(&controller, &comm_encoder);
-			 }
+
+			 torque_control(&controller);
+			 field_weaken(&controller);
+			 commutate(&controller, &comm_encoder);
+
 			 controller.timeout ++;
 			 break;
 
