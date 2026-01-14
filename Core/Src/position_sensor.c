@@ -12,6 +12,10 @@
 #include "user_config.h"
 
 void ps_warmup(EncoderStruct * encoder, int n){
+	if (encoder == NULL || n <= 0) {
+        return;
+    }
+	
 	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
 	for(int i = 0; i<n; i++){
 		encoder->spi_tx_word = 0x0000;
@@ -23,9 +27,12 @@ void ps_warmup(EncoderStruct * encoder, int n){
 }
 
 void ps_sample(EncoderStruct * encoder, float dt){
+	if (encoder == NULL || dt <= 0) {
+        return;
+    }
 	/* updates EncoderStruct encoder with the latest sample
 	 * after elapsed time dt */
-
+	
 	/* Shift around previous samples */
 	encoder->old_angle = encoder->angle_singleturn;
 	for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];}
